@@ -4,22 +4,26 @@ import boto3
 # The "resources" interface allow for a higher-level abstraction than the low-level client interface.
 # More details here: http://boto3.readthedocs.io/en/latest/guide/resources.html
 dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-table = dynamodb.Table('Books')
+table = dynamodb.Table('reddit')
 
 
 # The BatchWriteItem API allows us to write multiple items to a table in one request.
 with table.batch_writer() as batch:
-    batch.put_item(Item={"Author": "John Grisham", "Title": "The Rainmaker",
-        "Category": "Suspense", "Formats": { "Hardcover": "J4SUKVGU", "Paperback": "D7YF4FCX" } })
-    batch.put_item(Item={"Author": "John Grisham", "Title": "The Firm",
-        "Category": "Suspense", "Formats": { "Hardcover": "Q7QWE3U2",
-        "Paperback": "ZVZAYY4F", "Audiobook": "DJ9KS9NM" } })
-    batch.put_item(Item={"Author": "James Patterson", "Title": "Along Came a Spider",
-        "Category": "Suspense", "Formats": { "Hardcover": "C9NR6RJ7",
-        "Paperback": "37JVGDZG", "Audiobook": "6348WX3U" } })
-    batch.put_item(Item={"Author": "Dr. Seuss", "Title": "Green Eggs and Ham",
-        "Category": "Children", "Formats": { "Hardcover": "GVJZQ7JK",
-        "Paperback": "A4TFUR98", "Audiobook": "XWMGHW96" } })
-    batch.put_item(Item={"Author": "William Shakespeare", "Title": "Hamlet",
-        "Category": "Drama", "Formats": { "Hardcover": "GVJZQ7JK",
-        "Paperback": "A4TFUR98", "Audiobook": "XWMGHW96" } })
+    batch.put_item(Item={'subreddit': 'fffffffuuuuuuuuuuuu', 'created_utc': 1312156800, 'id': 'c298mtc', 
+        'author': 'DorkyDude', 'body': '"$2, would you take that deal? I\'d take that deal"'} )
+    batch.put_item(Item={'subreddit': 'motorcycles', 'created_utc': 1312156803, 'id': 'c298mtg', 
+        'author': 'TrptJim', 'body': 'Have you wrecked in them yet?'} )
+    batch.put_item(Item={'subreddit': 'reddevils', 'created_utc': 1312156801, 'id': 'c298mth', 
+        'author': 'Migeycan87', 'body': 'I was thinking 170k max, but if we get another player off the books (Gibson) there would be a small bit more room to maneuver?'} )
+    batch.put_item(Item={'subreddit': 'politics', 'created_utc': 1312156802, 'id': 'c298mti', 
+        'author': 'chaon93', 'body': 'a baton is more likely to kill someone than a taser'} )
+    batch.put_item(Item={'subreddit': 'WTF', 'created_utc': 1312156800,  'id': 'c298mtl', 
+        'author': 'Typoking', 'body': 'Cut him a break, he probably just finished watching Training Day. '} )
+
+
+
+        
+
+
+
+
