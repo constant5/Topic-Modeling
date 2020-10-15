@@ -1,14 +1,9 @@
-         ___        ______     ____ _                 _  ___  
-        / \ \      / / ___|   / ___| | ___  _   _  __| |/ _ \ 
-       / _ \ \ /\ / /\___ \  | |   | |/ _ \| | | |/ _` | (_) |
-      / ___ \ V  V /  ___) | | |___| | (_) | |_| | (_| |\__, |
-     /_/   \_\_/\_/  |____/   \____|_|\___/ \__,_|\__,_|  /_/ 
- ----------------------------------------------------------------- 
+to use these scripts you must connect to the aws cli with the proper credentials
 
+aws_access_key_id=foo
+aws_secret_access_key=bar
+aws_session_token=baz
 
-Hi there! Welcome to AWS Cloud9!
+These are stored in ~/.aws/credentials
 
-To get started, create some files, play with the terminal,
-or visit https://docs.aws.amazon.com/console/cloud9/ for our documentation.
-
-Happy coding!
+they can be found on the workbench page of the AWS class room under "Account Details"

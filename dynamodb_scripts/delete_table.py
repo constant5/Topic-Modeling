@@ -4,7 +4,7 @@ client = boto3.client('dynamodb', region_name='us-east-1')
 
 try:
     resp = client.delete_table(
-        TableName="Books",
+        TableName="reddit",
     )
     print("Table deleted successfully!")
 except Exception as e:
