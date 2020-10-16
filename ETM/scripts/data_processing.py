@@ -7,7 +7,7 @@ from pprint import pprint
 
 # get list of b22 file in data folder
 DATA_FOLDER = 'data'
-bz2files = glob(os.path.join(DATA_FOLDER,'*.bz2'))
+bz2files = glob(os.path.join('..',DATA_FOLDER,'*.bz2'))
 
 # for all bz2 files get a subset of attributes
 
@@ -22,12 +22,10 @@ def data_processing(bz2files, max_lines=-1):
 
         # pprint(bzr.build_structure())
         for data in bzr.select_keys():
-            print(data)
-        # insert rest of pipeline here
-        return 
+            yield data['body']
 
 def test():
-    data_processing(bz2files, 100)
+    for d in data_processing(bz2files, 100): print(d)
 
 if __name__=="__main__":
     test()
