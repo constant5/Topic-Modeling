@@ -5,3 +5,4 @@ ETM/data/
 ETM/results/
 ETM/scripts/*.out
 ETM/*out
+ETM/embeddings.txt
