@@ -1,0 +1,182 @@
+ETM main.py output
+
+python main.py --mode eval --dataset reddit --data_path data/reddit --num_topics
+50 --train_embeddings 1 --tc 1 --td 1 --load_from results/etm_reddit_K_50_Htheta_800_Optim_adam_Clip_0.0_ThetaAct_relu_Lr_0.005_Bsz_1000_RhoSize_300_trainEmbeddings_1
+
+
+=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+Training an Embedded Topic Model on REDDIT with the following settings: Namespace(anneal_lr=0, batch_size=1000, bow_norm=1, clip=0.0, data_path='data/reddit', dataset='reddit', emb_path='data/20ng_embeddings.txt', emb_size=300, enc_drop=0.0, epochs=20, eval_batch_size=1000, load_from='results/etm_reddit_K_50_Htheta_800_Optim_adam_Clip_0.0_ThetaAct_relu_Lr_0.005_Bsz_1000_RhoSize_300_trainEmbeddings_1', log_interval=2, lr=0.005, lr_factor=4.0, mode='eval', nonmono=10, num_docs_test=161055, num_docs_test_1=161055, num_docs_test_2=161055, num_docs_train=383888, num_docs_valid=191991, num_topics=50, num_words=10, optimizer='adam', rho_size=300, save_path='./results', seed=2019, t_hidden_size=800, tc=1, td=1, theta_act='relu', train_embeddings=1, visualize_every=10, vocab_size=36486, wdecay=1.2e-06)
+=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+model: ETM(
+  (t_drop): Dropout(p=0.0, inplace=False)
+  (theta_act): ReLU()
+  (rho): Linear(in_features=300, out_features=36486, bias=False)
+  (alphas): Linear(in_features=300, out_features=50, bias=False)
+  (q_theta): Sequential(
+    (0): Linear(in_features=36486, out_features=800, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=800, out_features=800, bias=True)
+    (3): ReLU()
+  )
+  (mu_q_theta): Linear(in_features=800, out_features=50, bias=True)
+  (logsigma_q_theta): Linear(in_features=800, out_features=50, bias=True)
+)
+****************************************************************************************************
+TEST Doc Completion PPL: 4931.0
+****************************************************************************************************
+Computing topic coherence...
+D:  383888
+k: 0/50
+k: 1/50
+k: 2/50
+k: 3/50
+k: 4/50
+k: 5/50
+k: 6/50
+k: 7/50
+k: 8/50
+k: 9/50
+k: 10/50
+k: 11/50
+k: 12/50
+k: 13/50
+k: 14/50
+k: 15/50
+k: 16/50
+k: 17/50
+k: 18/50
+k: 19/50
+k: 20/50
+k: 21/50
+k: 22/50
+k: 23/50
+k: 24/50
+k: 25/50
+k: 26/50
+k: 27/50
+k: 28/50
+k: 29/50
+k: 30/50
+k: 31/50
+k: 32/50
+k: 33/50
+k: 34/50
+k: 35/50
+k: 36/50
+k: 37/50
+k: 38/50
+k: 39/50
+k: 40/50
+k: 41/50
+k: 42/50
+k: 43/50
+k: 44/50
+k: 45/50
+k: 46/50
+k: 47/50
+k: 48/50
+k: 49/50
+counter:  55
+num topics:  50
+Topic coherence is: 0.16988303506677574
+Computing topic diversity...
+Topic diveristy is: 0.1064
+batch: 100/384
+batch: 200/384
+batch: 300/384
+
+The 10 most used topics are [18 49 36 17 16 15  8 33 46 27]
+
+
+Topic 0: ['people', 'make', 'good', 'lot', 'time', 'pretty', 'read', 'makes', 'game']
+Topic 1: ['people', 'time', 'good', 'make', 'pretty', 'thing', 'lot', 'feel', 'love']
+Topic 2: ['people', 'make', 'good', 'time', 'pretty', 'lot', 'thing', 'love', 'work']
+Topic 3: ['people', 'make', 'good', 'time', 'things', 'lot', 'pretty', 'thing', 'find']
+Topic 4: ['people', 'make', 'good', 'things', 'lot', 'time', 'find', 'work', 'thing']
+Topic 5: ['people', 'make', 'good', 'time', 'lot', 'pretty', 'find', 'things', 'thing']
+Topic 6: ['people', 'make', 'good', 'time', 'pretty', 'work', 'lot', 'thing', 'find']
+Topic 7: ['time', 'good', 'pretty', 'back', 'feel', 'make', 'love', 'thing', 'fucking']
+Topic 8: ['people', 'point', 'means', 'understand', 'fact', 'system', 'agree', 'problem', 'make']
+Topic 9: ['time', 'good', 'pretty', 'people', 'make', 'love', 'feel', 'thing', 'lot']
+Topic 10: ['people', 'make', 'good', 'lot', 'time', 'pretty', 'find', 'game', 'read']
+Topic 11: ['time', 'good', 'back', 'pretty', 'feel', 'love', 'things', 'thing', 'make']
+Topic 12: ['time', 'good', 'pretty', 'love', 'make', 'feel', 'back', 'people', 'thing']
+Topic 13: ['time', 'good', 'make', 'pretty', 'feel', 'back', 'people', 'love', 'thing']
+Topic 14: ['people', 'make', 'things', 'point', 'understand', 'real', 'person', 'part', 'makes']
+Topic 15: ['evidence', 'men', 'system', 'law', 'people', 'simply', 'number', 'based', 'point']
+Topic 16: ['evidence', 'system', 'based', 'argument', 'law', 'point', 'laws', 'number', 'human']
+Topic 17: ['evidence', 'point', 'system', 'based', 'people', 'number', 'argument', 'law', 'simply']
+Topic 18: ['money', 'government', 'pay', 'spending', 'tax', 'vote', 'market', 'debt', 'private']
+Topic 19: ['time', 'good', 'make', 'pretty', 'people', 'love', 'thing', 'feel', 'find']
+Topic 20: ['people', 'make', 'point', 'understand', 'real', 'part', 'problem', 'means', 'reason']
+Topic 21: ['time', 'good', 'pretty', 'love', 'make', 'people', 'feel', 'thing', 'back']
+Topic 22: ['time', 'good', 'pretty', 'feel', 'love', 'back', 'make', 'thing', 'fucking']
+Topic 23: ['people', 'make', 'good', 'time', 'pretty', 'lot', 'thing', 'work', 'find']
+Topic 24: ['time', 'good', 'back', 'pretty', 'feel', 'love', 'thing', 'make', 'fucking']
+Topic 25: ['people', 'make', 'point', 'understand', 'things', 'part', 'real', 'good', 'makes']
+Topic 26: ['people', 'make', 'point', 'real', 'things', 'money', 'part', 'understand', 'reason']
+Topic 27: ['people', 'point', 'make', 'understand', 'part', 'real', 'problem', 'fact', 'means']
+Topic 28: ['people', 'make', 'point', 'understand', 'real', 'part', 'means', 'things', 'reason']
+Topic 29: ['time', 'back', 'day', 'years', 'feel', 'told', 'friends', 'pretty', 'things']
+Topic 30: ['people', 'make', 'good', 'time', 'things', 'pretty', 'lot', 'thing', 'work']
+Topic 31: ['people', 'make', 'good', 'lot', 'things', 'makes', 'find', 'part', 'person']
+Topic 32: ['good', 'people', 'time', 'make', 'pretty', 'lot', 'thing', 'love', 'things']
+Topic 33: ['people', 'point', 'fact', 'means', 'system', 'understand', 'agree', 'problem', 'simply']
+Topic 34: ['people', 'make', 'point', 'understand', 'real', 'part', 'means', 'reason', 'person']
+Topic 35: ['time', 'good', 'back', 'pretty', 'feel', 'love', 'make', 'fucking', 'thing']
+Topic 36: ['people', 'point', 'evidence', 'system', 'simply', 'based', 'number', 'fact', 'law']
+Topic 37: ['people', 'make', 'good', 'things', 'money', 'lot', 'real', 'makes', 'part']
+Topic 38: ['people', 'make', 'good', 'time', 'lot', 'pretty', 'work', 'find', 'things']
+Topic 39: ['time', 'people', 'good', 'make', 'pretty', 'love', 'thing', 'feel', 'lot']
+Topic 40: ['time', 'back', 'good', 'feel', 'pretty', 'love', 'fucking', 'day', 'guy']
+Topic 41: ['time', 'good', 'pretty', 'feel', 'make', 'back', 'love', 'people', 'thing']
+Topic 42: ['people', 'good', 'make', 'time', 'pretty', 'lot', 'thing', 'love', 'find']
+Topic 43: ['time', 'good', 'people', 'make', 'pretty', 'love', 'feel', 'thing', 'lot']
+Topic 44: ['people', 'make', 'good', 'time', 'pretty', 'lot', 'thing', 'work', 'love']
+Topic 45: ['people', 'make', 'good', 'time', 'pretty', 'lot', 'thing', 'work', 'find']
+Topic 46: ['people', 'point', 'understand', 'fact', 'means', 'system', 'based', 'problem', 'simply']
+Topic 47: ['people', 'make', 'good', 'time', 'pretty', 'love', 'feel', 'lot', 'thing']
+Topic 48: ['time', 'good', 'pretty', 'make', 'people', 'love', 'feel', 'thing', 'made']
+Topic 49: ['told', 'friend', 'back', 'girl', 'friends', 'day', 'started', 'time', 'night']
+
+
+ETM embeddings...
+vectors:  (36486, 300)
+query:  (300,)
+word: andrew .. etm neighbors: ['andrew', 'phew', 'nirvana', 'recognisable', 'steamworks', 'holland', 'transcribing', 'downers', 'hilly', 'headroom', 'ethiopian', 'concretely', 'chimes', 'meatheads', 'absurdities', 'tel', 'panniers', 'perverts', 'submitters', 'pricepoint']
+vectors:  (36486, 300)
+query:  (300,)
+word: woman .. etm neighbors: ['woman', 'side', 'care', 'killed', 'bring', 'make', 'black', 'things', 'bad', 'made', 'supposed', 'show', 'find', 'man', 'lot', 'long', 'huge', 'work', 'kind', 'giving']
+vectors:  (36486, 300)
+query:  (300,)
+word: computer .. etm neighbors: ['computer', 'read', 'lot', 'body', 'comment', 'post', 'experience', 'learn', 'makes', 'fit', 'find', 'lose', 'bullshit', 'give', 'work', 'show', 'good', 'make', 'bad', 'meant']
+vectors:  (36486, 300)
+query:  (300,)
+word: sports .. etm neighbors: ['sports', 'guess', 'online', 'posting', 'posted', 'game', 'ton', 'sound', 'fan', 'eat', 'pretty', 'buy', 'love', 'play', 'totally', 'lots', 'hard', 'sounds', 'job', 'video']
+vectors:  (36486, 300)
+query:  (300,)
+word: religion .. etm neighbors: ['religion', 'data', 'religious', 'evidence', 'claim', 'definition', 'belief', 'nature', 'humans', 'existence', 'object', 'actions', 'language', 'philosophy', 'science', 'men', 'claims', 'define', 'logic', 'rape']
+vectors:  (36486, 300)
+query:  (300,)
+word: man .. etm neighbors: ['man', 'care', 'run', 'taking', 'made', 'giving', 'make', 'top', 'bring', 'supposed', 'lot', 'local', 'huge', 'thing', 'side', 'work', 'give', 'bad', 'plan', 'good']
+vectors:  (36486, 300)
+query:  (300,)
+word: love .. etm neighbors: ['love', 'hate', 'playing', 'fun', 'play', 'feel', 'fucking', 'amazing', 'nice', 'eat', 'stuff', 'watch', 'fuck', 'pretty', 'cool', 'awesome', 'totally', 'gonna', 'picture', 'hell']
+vectors:  (36486, 300)
+query:  (300,)
+word: intelligence .. etm neighbors: ['intelligence', 'field', 'believing', 'method', 'tool', 'rape', 'information', 'assault', 'stated', 'knowledge', 'bible', 'designed', 'technical', 'detail', 'teaching', 'concept', 'scale', 'prove', 'stating', 'recognize']
+vectors:  (36486, 300)
+query:  (300,)
+word: money .. etm neighbors: ['money', 'pay', 'price', 'low', 'cost', 'afford', 'paying', 'cash', 'free', 'total', 'company', 'future', 'massive', 'party', 'poor', 'credit', 'amount', 'student', 'service', 'cut']
+vectors:  (36486, 300)
+query:  (300,)
+word: politics .. etm neighbors: ['politics', 'public', 'market', 'additional', 'state', 'create', 'companies', 'majority', 'raise', 'power', 'term', 'current', 'system', 'higher', 'voting', 'military', 'legally', 'country', 'increase', 'vote']
+vectors:  (36486, 300)
+query:  (300,)
+word: health .. etm neighbors: ['health', 'lower', 'business', 'raise', 'vote', 'country', 'companies', 'interest', 'market', 'costs', 'poor', 'industry', 'million', 'cost', 'large', 'default', 'jobs', 'limit', 'average', 'prices']
+vectors:  (36486, 300)
+query:  (300,)
+word: people .. etm neighbors: ['people', 'person', 'part', 'wrong', 'idea', 'real', 'interesting', 'similar', 'expect', 'making', 'single', 'sort', 'make', 'line', 'change', 'doubt', 'build', 'account', 'share', 'quality']
+vectors:  (36486, 300)
+query:  (300,)
+word: family .. etm neighbors: ['family', 'back', 'wanted', 'car', 'day', 'starts', 'head', 'half', 'school', 'gave', 'year', 'left', 'telling', 'pain', 'face', 'hear', 'knew', 'interested', 'years', 'needed']
