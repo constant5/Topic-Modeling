@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 ## modified from data_20ng by crm
 
 ## TODO:check out data_nyt as a better starting point
 
-=======
->>>>>>> b5d8d772c6250ddfb70aad2e9e21287429cf22b6
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.datasets import fetch_20newsgroups
 import numpy as np
