@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 ## modified from data_20ng by crm
 
 ## TODO:check out data_nyt as a better starting point
 
+=======
+>>>>>>> b5d8d772c6250ddfb70aad2e9e21287429cf22b6
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.datasets import fetch_20newsgroups
 import numpy as np
@@ -93,6 +96,7 @@ id2word = dict([(j, w) for j, w in enumerate(vocab)])
 
 # Split in train/test/valid
 print('tokenizing documents and splitting into train/test/valid...')
+<<<<<<< HEAD
 num_docs =  cvz.shape[0]
 trSize = int(np.floor(0.85*num_docs))
 tsSize = int(np.floor(0.10*num_docs))
@@ -104,15 +108,37 @@ idx_permute = np.random.permutation(num_docs).astype(int)
 
 # Remove words not in train_data
 vocab = list(set([w for idx_d in range(trSize) for w in init_docs[idx_permute[idx_d]].split() if w in word2id]))
+=======
+num_docs = len(data)
+trSize = int(num_docs*.50)
+tsSize = int(num_docs*.25)
+vaSize = int(num_docs*.25)
+
+
+# num_docs_tr = len(init_docs_tr)
+# trSize = num_docs_tr-100
+# tsSize = len(init_docs_ts)
+# vaSize = 100
+idx_permute = np.random.permutation(num_docs).astype(int)
+
+# Remove words not in train_data
+vocab = list(set([w for idx_d in range(trSize) for w in data[idx_permute[idx_d]].split() if w in word2id]))
+>>>>>>> b5d8d772c6250ddfb70aad2e9e21287429cf22b6
 word2id = dict([(w, j) for j, w in enumerate(vocab)])
 id2word = dict([(j, w) for j, w in enumerate(vocab)])
 print('  vocabulary after removing words not in train: {}'.format(len(vocab)))
 
 # Split in train/test/valid
+<<<<<<< HEAD
 docs_tr = [[word2id[w] for w in init_docs[idx_permute[idx_d]].split() if w in word2id] for idx_d in range(trSize)]
 docs_ts = [[word2id[w] for w in init_docs[idx_permute[idx_d+trSize]].split() if w in word2id] for idx_d in range(tsSize)]
 docs_va = [[word2id[w] for w in init_docs[idx_permute[idx_d+trSize+tsSize]].split() if w in word2id] for idx_d in range(vaSize)]
 del init_docs
+=======
+docs_tr = [[word2id[w] for w in data[idx_permute[idx_d]].split() if w in word2id] for idx_d in range(trSize)]
+docs_va = [[word2id[w] for w in data[idx_permute[idx_d+trSize]].split() if w in word2id] for idx_d in range(vaSize)]
+docs_ts = [[word2id[w] for w in data[idx_d+vaSize].split() if w in word2id] for idx_d in range(tsSize)]
+>>>>>>> b5d8d772c6250ddfb70aad2e9e21287429cf22b6
 
 print('  number of documents (train): {} [this should be equal to {}]'.format(len(docs_tr), trSize))
 print('  number of documents (test): {} [this should be equal to {}]'.format(len(docs_ts), tsSize))
