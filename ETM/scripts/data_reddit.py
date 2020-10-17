@@ -26,6 +26,8 @@ with open('stops.txt', 'r') as f:
 
 # Read data
 print('reading data...')
+
+
 # get list of b22 file in data folder
 DATA_FOLDER = 'data'
 bz2files = glob(os.path.join('..',DATA_FOLDER,'*.bz2'))
@@ -51,15 +53,6 @@ def data_processing(bz2files, max_lines=-1):
             yield " ".join(data)
 
 init_docs = [d for d in data_processing(bz2files, 2500000)]
-
-
-# these steps may be vary costly (scan all record for each list comprehension)
-# moved the first yield here to save memory
-# init_docs = [re.findall(r'''[\w']+|[.,!?;-~{}`´_<=>:/@*()&'$%#"]''', doc) for doc in data_processing(bz2files, 200)]
-# init_docs = [[w.lower() for w in init_docs[doc] if not contains_punctuation(w)] for doc in range(len(init_docs))]
-# init_docs = [[w for w in init_docs[doc] if not contains_numeric(w)] for doc in range(len(init_docs))]
-# init_docs = [[w for w in init_docs[doc] if len(w)>1] for doc in range(len(init_docs))]
-# init_docs = [" ".join(init_docs[doc]) for doc in range(len(init_docs))]
 
 # Create count vectorizer
 print('counting document frequency of words...')

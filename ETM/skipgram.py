@@ -25,11 +25,16 @@ class MySentences(object):
         self.filename = filename
  
     def __iter__(self):
-        for line in open(self.filename):
-            yield line.split()
-
+        try:
+            for line in open(self.filename):
+                yield line.split()
+        except:
+            for line in pickle.load(open(self.filename,"rb")):
+                yield line.split()
+            
 # Gensim code to obtain the embeddings
 sentences = MySentences(args.data_file) # a memory-friendly iterator
+
 model = gensim.models.Word2Vec(sentences, min_count=args.min_count, sg=args.sg, size=args.dim_rho, 
     iter=args.iters, workers=args.workers, negative=args.negative_samples, window=args.window_size)
 
