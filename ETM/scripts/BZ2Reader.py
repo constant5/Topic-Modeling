@@ -49,9 +49,9 @@ class bz2reader():
 
 
     
-    def __del__(self):
-        if self.file_object:
-            self.file_object.close()
+    # def __del__(self):
+    #     if self.file_object:
+    #         self.file_object.close()
 
     
 

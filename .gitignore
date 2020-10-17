@@ -1,3 +1,5 @@
 data/*.bz2
 .vscode/
 __pycache__/
+ETM/data/
+ETM/results/
