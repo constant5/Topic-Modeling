@@ -1,0 +1,12 @@
+data processing
+pytorch gpu-1.5.0 has been unloaded! 
+pytorch gpu-1.5.0 has been successfully loaded! 
+To add any additional packages, use: pip install <package-name> --user 
+Requirement already satisfied: sklearn in /home/crm0376/.local/lib/python3.7/site-packages (0.0)
+Requirement already satisfied: scikit-learn in /home/crm0376/.local/lib/python3.7/site-packages (from sklearn) (0.23.2)
+Requirement already satisfied: numpy>=1.13.3 in /cm/shared/utils/PYTHON/3.7.4/lib/python3.7/site-packages/numpy-1.18.2-py3.7-linux-x86_64.egg (from scikit-learn->sklearn) (1.18.2)
+Requirement already satisfied: joblib>=0.11 in /home/crm0376/.local/lib/python3.7/site-packages (from scikit-learn->sklearn) (0.17.0)
+Requirement already satisfied: threadpoolctl>=2.0.0 in /home/crm0376/.local/lib/python3.7/site-packages (from scikit-learn->sklearn) (2.1.0)
+Requirement already satisfied: scipy>=0.19.1 in /home/crm0376/.local/lib/python3.7/site-packages (from scikit-learn->sklearn) (1.4.1)
+WARNING: You are using pip version 20.1; however, version 20.2.3 is available.
+You should consider upgrading via the '/cm/shared/utils/PYTHON/3.7.4/bin/python3.7 -m pip install --upgrade pip' command.
