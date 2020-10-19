@@ -1,0 +1,40 @@
+data processing
+pytorch gpu-1.5.0 has been unloaded! 
+pytorch gpu-1.5.0 has been successfully loaded! 
+To add any additional packages, use: pip install <package-name> --user 
+Requirement already satisfied: sklearn in /home/crm0376/.local/lib/python3.7/site-packages (0.0)
+Requirement already satisfied: scikit-learn in /home/crm0376/.local/lib/python3.7/site-packages (from sklearn) (0.23.2)
+Requirement already satisfied: numpy>=1.13.3 in /cm/shared/utils/PYTHON/3.7.4/lib/python3.7/site-packages/numpy-1.18.2-py3.7-linux-x86_64.egg (from scikit-learn->sklearn) (1.18.2)
+Requirement already satisfied: joblib>=0.11 in /home/crm0376/.local/lib/python3.7/site-packages (from scikit-learn->sklearn) (0.17.0)
+Requirement already satisfied: threadpoolctl>=2.0.0 in /home/crm0376/.local/lib/python3.7/site-packages (from scikit-learn->sklearn) (2.1.0)
+Requirement already satisfied: scipy>=0.19.1 in /home/crm0376/.local/lib/python3.7/site-packages (from scikit-learn->sklearn) (1.4.1)
+WARNING: You are using pip version 20.1; however, version 20.2.3 is available.
+You should consider upgrading via the '/cm/shared/utils/PYTHON/3.7.4/bin/python3.7 -m pip install --upgrade pip' command.
+reading data...
+counting document frequency of words...
+building the vocabulary...
+  initial vocabulary size: 117245
+  vocabulary size after removing stopwords from list: 116754
+tokenizing documents and splitting into train/test/valid...
+  vocabulary after removing words not in train: 116754
+  number of documents (train): 8500000 [this should be equal to 8500000]
+  number of documents (test): 1000000 [this should be equal to 1000000]
+  number of documents (valid): 500000 [this should be equal to 500000]
+removing empty documents...
+splitting test documents in 2 halves...
+creating lists of words...
+  len(words_tr):  93651300
+  len(words_ts):  10844093
+  len(words_ts_h1):  5229615
+  len(words_ts_h2):  5614478
+  len(words_va):  5486952
+getting doc indices...
+  len(np.unique(doc_indices_tr)): 8263903 [this should be 8263903]
+  len(np.unique(doc_indices_ts)): 818386 [this should be 818386]
+  len(np.unique(doc_indices_ts_h1)): 818386 [this should be 818386]
+  len(np.unique(doc_indices_ts_h2)): 818386 [this should be 818386]
+  len(np.unique(doc_indices_va)): 486122 [this should be 486122]
+creating bow representation...
+splitting bow intro token/value pairs and saving to disk...
+Data ready !!
+*************

@@ -3,3 +3,6 @@ data/*.bz2
 __pycache__/
 ETM/data/
 ETM/results/
+ETM/scripts/*.out
+ETM/*out
+ETM/embeddings.txt
