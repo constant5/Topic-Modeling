@@ -1,6 +1,6 @@
 # script for data processing pipeline
 
-from BZ2Reader import bz2reader
+from .BZ2Reader import bz2reader
 from glob import glob
 import os
 from pprint import pprint
