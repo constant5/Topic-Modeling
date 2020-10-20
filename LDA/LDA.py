@@ -172,7 +172,7 @@ else:
     # Create and fit the LDA model
     print(f'fitting the LDA model with {number_topics} topics')
     lda = LDA(n_components=number_topics,
-            learning_method='online',
+            # learning_method='online',
             max_iter=args.max_iter, 
             evaluate_every=3, 
             verbose=1,
