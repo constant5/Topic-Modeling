@@ -1,11 +1,12 @@
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
 # %%
-from IPython import get_ipython
 
-# %%
+# import warnings filter
+from warnings import simplefilter
+# ignore all future warnings
+simplefilter(action='ignore', category=FutureWarning)
+
 import argparse
-from scripts.data_processing import *
+from scripts.data_processing import data_processing
 from glob import glob
 import os
 import re
@@ -23,25 +24,20 @@ import pickle
 import pyLDAvis
 import random
 
-
-# import warnings
-# warnings.filterwarnings('ignore')
-# warnings.simplefilter('ignore')
-
-
 parser = argparse.ArgumentParser(description='LDA Model')
 
 ### arguments
 parser.add_argument('--data_dir', type=str, default='data', help='directory where data is located')
-parser.add_argument('--num_posts', type=int, default=1000000, help='number of posts to load')
+parser.add_argument('--num_posts', type=int, default=2500000, help='number of posts to load')
 parser.add_argument('--word_cloud', type=int, default=0, help='make word cloud plot')
-parser.add_argument('--n_features', type=int, default=2**20, help='dimension of hash vectors')
+parser.add_argument('--n_features', type=int, default=40000, help='dimension of hash vectors')
 parser.add_argument('--topics', type=int, default=10, help='number of topics for LDA model')
 parser.add_argument('--hash_vect', type=str, default=None, help='location of vectorizer (ex. models/hash_vect.pk)')
 parser.add_argument('--lda_path', type=str, default=None, help='location of lda model (ex. models/lda_model.pk)')
 parser.add_argument('--plot_10', type=int, default =0 , help='plot top 10 words from vectorization')
 parser.add_argument('--max_iter', type=int, default=10, help='iterations of LDA algorithm')
-
+parser.add_argument('--prepare_vis', type=int, default=0, help='prepare LDAvis')
+parser.add_argument('--run_exp', type=str, default=None, help='list(n_topics) to fit LDA')
 args = parser.parse_args()
 
 
@@ -49,16 +45,14 @@ args = parser.parse_args()
 # %%
 
 data_path = os.path.join(args.data_dir, '*.bz2')
-print(data_path)
 bzfile = glob(data_path)
-print(bzfile)
 d = data_processing(bzfile, args.num_posts)
-
-# ### Data processing steps
-# %%
 print('loading data...', end=' ')
 data = [l for l in d]
 print('done')
+
+# ### Data processing steps
+# %%
 # Remove punctuation
 print('processing data...', end=' ')
 data = [re.sub('[,\\.!?]', '', x) for x in data]
@@ -162,55 +156,64 @@ def print_topics(model, count_vectorizer, n_top_words):
         print(" ".join([words[i][0]['name']
                         for i in topic.argsort()[:-n_top_words - 1:-1]]))
         
-
-
-number_topics = args.topics
-if args.lda_path:
-    lda = pickle.load(open(args.lda_path, 'rb'))
-else:
- 
-    # Create and fit the LDA model
+def lda_experiment(number_topics, hash_data, max_iter):
+    print(number_topics)
     print(f'fitting the LDA model with {number_topics} topics')
     lda = LDA(n_components=number_topics,
-            # learning_method='online',
-            max_iter=args.max_iter, 
-            evaluate_every=3, 
+            learning_method='online',
+            max_iter=max_iter, 
+            evaluate_every=5,
+            batch_size=128**2, 
             verbose=1,
-            n_jobs=1)
-    lda.fit(hash_data)
-
+            n_jobs=-1)
     # save model
+    lda.fit(hash_data)
     print('saving LDA model ...', end='')
-    pickle.dump(lda, open(os.path.join('models','lda_model.pk'), 'wb'))
+    pickle.dump(lda, open(os.path.join('models',f'lda_model_{number_topics}.pk'), 'wb'))
+    print('done')
+    return lda
+
+number_topics = args.topics
+
+if not args.run_exp:
+    if args.lda_path:
+        lda = pickle.load(open(args.lda_path, 'rb'))
+    else:
+        lda = lda_experiment(args.topics, hash_data, args.max_iter)
+
+
+    # Print the topics found by the LDA model
+    print("Topics found via LDA:")
+    number_words = 10
+    print(f'Displaying top {number_words} words in LDA topics')
+    print_topics(lda, ivec, number_words)
+
+
+
+
+# %%
+
+def prepare_vis(lda, count_sample, ivec,number_topics):
+    print('preparing LDAvis...', end=' ')
+    LDAvis_data_filepath = os.path.join('results','./ldavis_prepared_'+str(number_topics))
+    # # this is a bit time consuming 
+    LDAvis_prepared = sklearn_lda.prepare(lda, count_sample, ivec)
+    pyLDAvis.save_html(LDAvis_prepared, LDAvis_data_filepath +'.html')
     print('done')
 
-
-# Print the topics found by the LDA model
-print("Topics found via LDA:")
-number_words = 10
-print(f'Displaying top {number_words} words in LDA topics')
-print_topics(lda, ivec, number_words)
-
-
-
+if args.prepare_vis:
+    prepare_vis(lda, count_sample, ivec,args.topics)
 
 # %%
+def run_experiment(n_topics, max_iter):
+    n_topics = [int(n) for n in n_topics.replace('[','').replace(']','').split(',')]
+    print(n_topics)
+    for n in n_topics:
+        # Create and fit the LDA model
+        lda = lda_experiment(n, hash_data, max_iter)
+        prepare_vis(lda, count_sample, ivec,n)
 
-LDAvis_data_filepath = os.path.join('./ldavis_prepared_'+str(number_topics))
-# # this is a bit time consuming - make the if statement True
-# # if you want to execute visualization prep yourself
-if 1 == 1:
-    LDAvis_prepared = sklearn_lda.prepare(lda, count_sample, ivec)
-    # with open(LDAvis_data_filepath, 'w') as f:
-    #         pickle.dump(LDAvis_prepared, f)
-        
-    # load the pre-prepared pyLDAvis data from disk
-    # with open(LDAvis_data_filepath) as f:
-    #     LDAvis_prepared = pickle.load(f)
-    pyLDAvis.save_html(LDAvis_prepared, './ldavis_prepared_'+ str(number_topics) +'.html')
-
-
-# %%
-
+if args.run_exp:
+    run_experiment(args.run_exp, args.max_iter)
 
 

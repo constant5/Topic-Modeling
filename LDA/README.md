@@ -17,6 +17,10 @@ For initial training of both the vectorizer and the LDA model
 python LDA.py --data_dir data --num_post 1000000 --n_features 40000 --topics 10
 
 
+### Experiment
+
+python LDA.py --num_posts 2500000--hash_vect models.hash_vect.pk --run_exp "[2,4,8,16,32,64,128]" --max_iter 20 
+
 
 
 
