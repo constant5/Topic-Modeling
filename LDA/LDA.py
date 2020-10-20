@@ -145,8 +145,6 @@ print('done')
 # # Fit and transform the processed titles
 # count_data = count_vectorizer.fit_transform(data)
 
-
-
 # Visualize the 10 most common words
 #plot_10_most_common_words(count_data, count_vectorizer)
 if args.plot_10:
