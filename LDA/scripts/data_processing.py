@@ -1,6 +1,6 @@
 # script for data processing pipeline
 
-from .BZ2Reader import bz2reader
+from BZ2Reader import bz2reader
 from glob import glob
 import os
 from pprint import pprint
@@ -24,8 +24,8 @@ def data_processing(bz2files, max_lines=-1):
         for data in bzr.select_keys():
             yield data['body']
 
-def test():
-    for d in data_processing(bz2files, 100): print(d)
+# def test():
+#     for d in data_processing(bz2files, 100): print(d)
 
-if __name__=="__main__":
-    test()
+# if __name__=="__main__":
+#     test()

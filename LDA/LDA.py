@@ -6,7 +6,9 @@ from warnings import simplefilter
 simplefilter(action='ignore', category=FutureWarning)
 
 import argparse
-from scripts.data_processing import data_processing
+
+from BZ2Reader import bz2reader
+# from scripts.data_processing.py import *
 from glob import glob
 import os
 import re
@@ -43,6 +45,20 @@ args = parser.parse_args()
 
 # ### Create post generator
 # %%
+
+
+def data_processing(bz2files, max_lines=-1):
+    for bz2file in  bz2files:
+        bzr = bz2reader(fname=bz2file,
+                        keys=['body'], 
+                        max_lines=max_lines)
+        # bzr = bz2reader(fname=bz2file,
+        #                 keys=['subreddit','id', 'author','body','created_utc'], 
+        #                 max_lines=max_lines)
+
+        # pprint(bzr.build_structure())
+        for data in bzr.select_keys():
+            yield data['body']
 
 data_path = os.path.join(args.data_dir, '*.bz2')
 bzfile = glob(data_path)
@@ -164,8 +180,8 @@ def lda_experiment(number_topics, hash_data, max_iter):
             max_iter=max_iter, 
             evaluate_every=5,
             batch_size=128**2, 
-            verbose=1,
-            n_jobs=-1)
+            verbose=1)
+            # n_jobs=-1)
     # save model
     lda.fit(hash_data)
     print('saving LDA model ...', end='')
