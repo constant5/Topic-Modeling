@@ -5,7 +5,7 @@ import pickle
 
 
 RS = redditscraper()
-LDA = lda_infer('LDA\\models\\hash_vect.pk', 'LDA\\models\\lda_model_2.pk')
+LDA = lda_infer('LDA\\models\\hash_vect.pk', 'LDA\\models\\lda_model_8.pk')
 
 sports  = RS.Get_Reddit_Comments('sports', 20)
 
