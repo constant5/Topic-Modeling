@@ -7,3 +7,6 @@ ETM/scripts/*.out
 ETM/*out
 ETM/embeddings.txt
 LDA/data/
+Reddit_Scraper/Credentials.txt
+Credentials.txt
+
