@@ -7,15 +7,20 @@ import pickle
 RS = redditscraper()
 LDA = lda_infer('LDA\\models\\hash_vect.pk', 'LDA\\models\\lda_model_2.pk')
 
-sports  = RS.Get_Reddit_Comments('sports', 10)
-politics  = RS.Get_Reddit_Comments('politics', 10)
+sports  = RS.Get_Reddit_Comments('sports', 20)
 
-data = [post for post in sports['title']] + [post for post in politics['title']]
-print(data)
+politics  = RS.Get_Reddit_Comments('politics', 20)
 
-hashed = LDA.hash_vectorize(data)
-predicted = LDA.lda_predict(hashed)
-topics = [np.where(r==r.max())[0][0] for r in predicted]
+sports = [post for post in sports['title']]
+politics = [post for post in politics['title']]
 
-for p,t in zip(data, topics):
-    print(t, ' : ', p )
+clean_sports, pred_sports = LDA.infer(sports)
+clean_politics, pred_poly = LDA.infer(politics)
+
+s_topics = [np.where(r==r.max())[0][0] for r in pred_sports]
+p_topics = [np.where(r==r.max())[0][0] for r in pred_poly]
+
+for post, pred in zip(clean_sports, s_topics):
+    print('r/sports' ,'-', pred, ' : ', post)
+for post, pred in zip(clean_politics, p_topics):
+    print('r/politics' ,'-', pred, ' : ', post)
