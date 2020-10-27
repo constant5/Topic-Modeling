@@ -11,8 +11,8 @@ class lda_infer():
         data = [re.sub('[,\\.!?]', '', x) for x in data]
         # Convert the titles to lowercase
         data = [x.lower() for x in data]
-        # Remove post with less than 10 words
-        data = [x for x in data if len(x.split(' '))>10]
+        # Remove post with less than 3 words
+        data = [x for x in data if len(x.split(' '))>3]
         return data
 
     def hash_vectorize(self, data):
