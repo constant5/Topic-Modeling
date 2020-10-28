@@ -92,7 +92,8 @@ class gui_interface():
         # self.credentials = credentials_dictionary
 
         # Test credentials
-        Test = redditscraper(credentials_dictionary).Get_Reddit_Comments('Politics', 1, 'top')
+        Test = redditscraper(credentials_dictionary).Get_Reddit_Comments('Politics', 1, 'top', after='3d')
+        print(Test)
 
 
         if isinstance(Test, pd.DataFrame):
@@ -149,7 +150,7 @@ class gui_interface():
 
         #Get Subreddit Pre-Check
         # Test_Request = self.scraper.Get_Reddit_Comments(Topic, 1)
-        Test_Request = self.scraper.Get_Reddit_Comments(self.Topic, 1, 'top')
+        Test_Request = self.scraper.Get_Reddit_Comments(self.Topic, 1, 'top', after='3d')
         
         if not isinstance(Test_Request, pd.DataFrame):
             
@@ -174,14 +175,14 @@ class gui_interface():
          
         self.Comments = self.scraper.Get_Reddit_Comments(self.Topic, 
                                     Limit=self.Limit, 
-                                    how='asc', 
-                                    duration='5y')
+                                    how='desc',
+                                    after='5y')
         
         # print(Comments)
 
         m.textbox.delete(1.0, Tkinter.END)
         count = 1
-        for title in self.Comments['title']:
+        for title in self.Comments['body']:
             try:
                 _, pred = self.get_topic_predict([title])
                 m.textbox.insert(Tkinter.END, str(count) + ':  ' )
@@ -206,10 +207,10 @@ class gui_interface():
     def _Plot_Graphs(self):
 
         # msg = 'Update code for the   < _Plot_Graphs  >  Method'
-        _, pred = self.get_topic_predict(list(self.Comments['title']))
+        _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
-        d = sns.displot(pred, bins=8).set(title=f'Distribution of r/{self.Topic} topics\nn={self.Limit}')
+        d = sns.displot(pred, bins=8).set(title=f'Distribution of r/{self.Topic} topics\nn={len(pred)}')
         mids = [rect.get_x() + rect.get_width() / 2 for rect in d.ax.patches]
         plt.xticks(ticks =mids, labels= [1,2,3,4,5,6,7,8])
         plt.tight_layout()
