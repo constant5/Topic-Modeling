@@ -2,10 +2,8 @@
 CSCE5214 Project 3
 
 <p align="center">
-  <img width="460" height="300" src="./LDA/results/wordcloud.png">
+  <img width="100%" height="300" src="./LDA/results/wordcloud.png">
 </p>
-![WordCloud](./LDA/results/wordcloud.png)
-
 
 
 See [chdoig pytexas 2015](https://github.com/chdoig/pytexas2015-topic-modeling) for some good images for slide. 
