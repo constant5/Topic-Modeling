@@ -1,6 +1,13 @@
 # Topic-Modeling
 CSCE5214 Project 3
 
+<p align="center">
+  <img width="460" height="300" src="./LDA/results/wordcloud.png">
+</p>
+![WordCloud](./LDA/results/wordcloud.png)
+
+
+
 See [chdoig pytexas 2015](https://github.com/chdoig/pytexas2015-topic-modeling) for some good images for slide. 
 
 [Project Slides](https://docs.google.com/presentation/d/1ERowUiQGl1vcdxdkJvggwoQTMK2b4Gydfo8AUgfXwBA/edit#slide=id.p)
@@ -33,5 +40,4 @@ The stored reddit dataset contains several years of reddit post stored in compre
 
 ![Top 10 words](./LDA/results/top10words.png)
 
-![WordCloud](./LDA/results/wordcloud.png)
 
