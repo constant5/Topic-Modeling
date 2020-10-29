@@ -175,7 +175,7 @@ class gui_interface():
          
         self.Comments = self.scraper.Get_Reddit_Comments(self.Topic, 
                                     Limit=self.Limit, 
-                                    how='desc',
+                                    how='asc',
                                     after='5y')
         
         # print(Comments)
@@ -199,14 +199,14 @@ class gui_interface():
                 m.textbox.update()
                 count += 1
                 pass
+            
 
     def _Get_Credentials(self):
 
         self.__Get_Credentials_File__("")
 
-    def _Plot_Graphs(self):
+    def _Plot_Dist(self):
 
-        # msg = 'Update code for the   < _Plot_Graphs  >  Method'
         _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
@@ -216,11 +216,15 @@ class gui_interface():
         plt.tight_layout()
         plt.show()
 
+    def _Plot_TS(self):
 
+        _, pred = self.get_topic_predict(list(self.Comments['body']))
+        t = range(len(pred))
+        sns.set_style('dark')
+        ts = sns.scatterplot(t, [p+1 for p in pred])
+        plt.tight_layout()
+        plt.show()
 
-        # m.textbox.delete(1.0, Tkinter.END)
-        # m.textbox.insert(1.0, msg )
-        # m.textbox.update()
 
     def _check_tbox_focus(self):
 
@@ -348,12 +352,19 @@ class gui_interface():
         TButton.bind('<ButtonPress-1>',self._ButtonPress)
         TButton.bind('<ButtonRelease-1>',self._ButtonRelease)
 
-        text = 'PLOT MATPLOTLIB GRAPHS'
-        command = self._Plot_Graphs
+        text = 'PLOT TOPIC DISTRIBUTION'
+        command = self._Plot_Dist
 
         PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
         __main__.PButton = PButton
         PButton.place(x=550,y=531)
+
+        text = 'PLOT TIME-SERIES'
+        command = self._Plot_TS
+
+        PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
+        __main__.PButton = PButton
+        PButton.place(x=550,y=561)
 
         text = 'GET REDDIT CREDENTIALS'
         command = self._Get_Credentials

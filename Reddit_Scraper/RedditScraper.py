@@ -26,11 +26,16 @@ class redditscraper():
     def get_pushshift_data(self, topic, limit, after, sort, score):
         if isinstance(after, int): 
             after=int(dt.datetime(after, 1, 1).timestamp())
+        
+        # there is a bug in the psaw module that requires this multiplier
+        if limit>100:
+            limit = limit * 10 
+
         return self.ps_api.search_comments(after=after,
                              subreddit=topic,
                              sort_type=score,
                              sort=sort,
-                             limit=limit*10) # there is a bug in the psaw module that requires this multiplier
+                             limit=limit) 
 
     def Get_Reddit_Comments(self, Sub_Reddit_Topic, Limit, how='top', after="5y"):
 
