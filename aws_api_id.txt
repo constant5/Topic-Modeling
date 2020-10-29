@@ -1,1 +1,0 @@
-YOUR_API_KEY = 1g0n8o24s6
