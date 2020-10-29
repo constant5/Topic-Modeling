@@ -20,11 +20,14 @@ The stored reddit dataset contains several years of reddit post stored in compre
 
 * Collected a subset of Reddit posts containing over 10M comments. 
 * Trained and evaluated several different LDA models to find the best model architecture for Reddit-style text.
+* Built an inference pipeline with AWS services. [Call an Amazon SageMaker model endpoint using Amazon API Gateway and AWS Lambda](https://aws.amazon.com/blogs/machine-learning/call-an-amazon-sagemaker-model-endpoint-using-amazon-api-gateway-and-aws-lambda/)
+
+
 * Deployed the chosen LDA model to monitor Reddit threads in a GUI that displays topic drift.
 
 
 
-[Call an Amazon SageMaker model endpoint using Amazon API Gateway and AWS Lambda](https://aws.amazon.com/blogs/machine-learning/call-an-amazon-sagemaker-model-endpoint-using-amazon-api-gateway-and-aws-lambda/)
+
 
 ![AWS](./img/sagemaker-endpoint-1.gif)
 
