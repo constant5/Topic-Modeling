@@ -1,18 +1,9 @@
-# Topic-Modeling
-CSCE5214 Project 3
+# <div align="center">Topic-Modeling</div>
+<div align="center">CSCE5214 Project 3</div>
 
 <p align="center">
-  <img width="100%" height="300" src="./LDA/results/wordcloud.png">
+  <img width="100%" height="600" src="./LDA/results/wordcloud.png">
 </p>
-
-
-See [chdoig pytexas 2015](https://github.com/chdoig/pytexas2015-topic-modeling) for some good images for slide. 
-
-[Project Slides](https://docs.google.com/presentation/d/1ERowUiQGl1vcdxdkJvggwoQTMK2b4Gydfo8AUgfXwBA/edit#slide=id.p)
-
-[Project Proposal](https://docs.google.com/document/d/1IurVytwQQfzHEKRggLSTXKWmXXx2LFkrBNVKZ_a2GtI/edit#heading=h.c5fey97qfjje)
-
-[Update Video](https://drive.google.com/file/d/1hvJlHa4zyfh-9UsIehlHxT7YNYm7797_/view?usp=sharing)
 
 
 ## Project Motivation
@@ -25,16 +16,28 @@ The stored reddit dataset contains several years of reddit post stored in compre
 
 * Collected a subset of Reddit posts containing over 10M comments. 
 * Trained and evaluated several different LDA models to find the best model architecture for Reddit-style text.
-* Built an inference pipeline with AWS services. [Call an Amazon SageMaker model endpoint using Amazon API Gateway and AWS Lambda](https://aws.amazon.com/blogs/machine-learning/call-an-amazon-sagemaker-model-endpoint-using-amazon-api-gateway-and-aws-lambda/)
+* Built an inference pipeline with AWS services. 
 
+![AWS](./img/sagemaker-endpoint-1.gif)
 
 * Deployed the chosen LDA model to monitor Reddit threads in a GUI that displays topic drift.
 
 
 
+## Resources
+
+See [chdoig pytexas 2015](https://github.com/chdoig/pytexas2015-topic-modeling) for some good images for slide. 
+
+[Project Slides](https://docs.google.com/presentation/d/1ERowUiQGl1vcdxdkJvggwoQTMK2b4Gydfo8AUgfXwBA/edit#slide=id.p)
+
+[Project Proposal](https://docs.google.com/document/d/1IurVytwQQfzHEKRggLSTXKWmXXx2LFkrBNVKZ_a2GtI/edit#heading=h.c5fey97qfjje)
+
+[Update Video](https://drive.google.com/file/d/1hvJlHa4zyfh-9UsIehlHxT7YNYm7797_/view?usp=sharing)
+
+![Amazon SageMaker](https://aws.amazon.com/blogs/machine-learning/call-an-amazon-sagemaker-model-endpoint-using-amazon-api-gateway-and-aws-lambda/)
 
 
-![AWS](./img/sagemaker-endpoint-1.gif)
+
 
 ![Top 10 words](./LDA/results/top10words.png)
 
