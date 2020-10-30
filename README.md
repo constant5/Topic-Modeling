@@ -2,7 +2,7 @@
 <div align="center">CSCE5214 Project 3</div>
 
 <p align="center">
-  <img width="100%" height="600" src="./LDA/results/wordcloud.png">
+  <img width="100%" height="500" src="./LDA/results/wordcloud.png">
 </p>
 
 
@@ -15,12 +15,27 @@ The stored reddit dataset contains several years of reddit post stored in compre
 ## Project Design
 
 * Collected a subset of Reddit posts containing over 10M comments. 
-* Trained and evaluated several different LDA models to find the best model architecture for Reddit-style text.
-* Built an inference pipeline with AWS services. 
+
+
+<p align="center">
+  <img width="600" height="400" src="./LDA/results/top10words.png">
+</p>
+
+* Trained and evaluated several different LDA models on AWS EC2 to find the best model architecture for Reddit-style text.
+
+<p align="center">
+  <img width="800 " height="500" src="./img/ldavis.PNG">
+</p>
+
+* Built an inference pipeline with AWS services to host the API model. 
 
 ![AWS](./img/sagemaker-endpoint-1.gif)
 
 * Deployed the chosen LDA model to monitor Reddit threads in a GUI that displays topic drift.
+
+<p align="center">
+  <img width="800 " height="350" src="./img/front end.png">
+</p>
 
 
 
@@ -34,11 +49,11 @@ See [chdoig pytexas 2015](https://github.com/chdoig/pytexas2015-topic-modeling) 
 
 [Update Video](https://drive.google.com/file/d/1hvJlHa4zyfh-9UsIehlHxT7YNYm7797_/view?usp=sharing)
 
-![Amazon SageMaker](https://aws.amazon.com/blogs/machine-learning/call-an-amazon-sagemaker-model-endpoint-using-amazon-api-gateway-and-aws-lambda/)
+[Amazon SageMaker](https://aws.amazon.com/blogs/machine-learning/call-an-amazon-sagemaker-model-endpoint-using-amazon-api-gateway-and-aws-lambda)
 
 
 
 
-![Top 10 words](./LDA/results/top10words.png)
+
 
 
