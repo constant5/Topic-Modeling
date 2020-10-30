@@ -11,6 +11,7 @@ from LDA.LDA_Infer import lda_infer
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.animation import FuncAnimation
 
 tkFileDialog = tkinter.filedialog
 
@@ -210,7 +211,7 @@ class gui_interface():
         _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
-        d = sns.displot(pred, bins=8).set(title=f'Distribution of r/{self.Topic} topics\nn={len(pred)}')
+        d = sns.displot(data=pred, bins=8).set(title=f'Distribution of r/{self.Topic} topics\nn={len(pred)}')
         mids = [rect.get_x() + rect.get_width() / 2 for rect in d.ax.patches]
         plt.xticks(ticks =mids, labels= [1,2,3,4,5,6,7,8])
         plt.tight_layout()
@@ -221,8 +222,28 @@ class gui_interface():
         _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
-        ts = sns.scatterplot(t, [p+1 for p in pred])
+        ts = sns.scatterplot(x=t, y=[p+1 for p in pred])
         plt.tight_layout()
+        plt.show()
+
+    def _Plot_Ani(self):
+        fig, ax = plt.subplots()
+        xdata, ydata = [], []
+        ln, = plt.plot([], [], 'ro')
+
+        def init():
+            ax.set_xlim(0, 2*np.pi)
+            ax.set_ylim(-1, 1)
+            return ln,
+
+        def update(frame):
+            xdata.append(frame)
+            ydata.append(np.sin(frame))
+            ln.set_data(xdata, ydata)
+            return ln,
+
+        ani = FuncAnimation(fig, update, frames=np.linspace(0, 2*np.pi, 128),
+                            init_func=init, blit=True)
         plt.show()
 
 
@@ -365,6 +386,14 @@ class gui_interface():
         PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
         __main__.PButton = PButton
         PButton.place(x=550,y=561)
+
+
+        text = 'ANIMATE TIME-SERIES'
+        command = self._Plot_Ani
+
+        PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
+        __main__.PButton = PButton
+        PButton.place(x=332,y=561)
 
         text = 'GET REDDIT CREDENTIALS'
         command = self._Get_Credentials
