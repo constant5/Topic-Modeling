@@ -292,28 +292,20 @@ class gui_interface():
         canvas.configure(background = 'white')
         canvas.pack(fill=Tkinter.BOTH, expand=1)
         canvas.update()
-
-        # Create a Grdient Background
-        for row in range(0,height)[::-1]:
-            r = int(row / (height - 1)*0)
-            g = int(row / (height - 1)*0)
-            b = int(row / (height - 1)*125)
-
-            canvas.create_line(0,row,width,row, fill = "#%02x%02x%02x" % (r, g, b) )
-
+        
         canvas2 = Tkinter.Canvas(window, highlightthickness=0)
         canvas2.configure(background = 'white')
         canvas2.place(x=25, y=50)
         canvas2.update()
 
-        textbox = Tkinter.Text(canvas2, relief=Tkinter.RAISED)
+        textbox = Tkinter.Text(canvas2, relief=Tkinter.FLAT)
         textbox.insert(Tkinter.END, "Type a Sub Reddit Topic in the Entry Box Below.\n")
         textbox.configure(font=("Arial",12))
 
         textbox.place(x=20, y=50)
         textbox['width'] = 80
         textbox['height'] = 26
-        textbox['bg'] =   'white'#'#008800'
+        textbox['bg'] =   '#eaeaf2' # 'white'
         textbox['bd'] = 2
         textbox.update()
     
