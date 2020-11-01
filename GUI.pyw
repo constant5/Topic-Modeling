@@ -218,19 +218,25 @@ class gui_interface():
             m.LBox.insert(0, "5")
             m.LBox.configure(fg='black')
             m.LBox.update()
-            Limit = 5
+            self.Limit = 5
 
         self.Limit = int(self.Limit)
 
         if "Type Sub Reddit Topic Here" in self.Topic or not self.Topic:
-
-            if not self.Topic:
                 
-                msg = "No Sub Reddit Topic Found in the Entry Box Below"
-                m.textbox.delete(1.0, Tkinter.END)
-                m.textbox.insert(Tkinter.END, msg)
+            msg = "No Sub Reddit Topic Found in the Entry Box Below"
+            m.textbox.delete(1.0, Tkinter.END)
+            m.textbox.insert(Tkinter.END, msg)
                 
             return
+
+        m.textbox.configure(fg='black')
+        m.textbox.delete(1.0, Tkinter.END)
+
+        msg ="\n\nGetting Reddit_Comments. Please Wait . . . \n\n"
+
+        m.textbox.insert(Tkinter.END, msg)
+        m.textbox.update()
 
         #Get Subreddit Pre-Check
         # Test_Request = self.scraper.Get_Reddit_Comments(Topic, 1)
@@ -267,6 +273,7 @@ class gui_interface():
         m.textbox.delete(1.0, Tkinter.END)
         count = 1
         for title in self.Comments['body']:
+            title = title.replace('\n', ' ')
             try:
                 _, pred = self.get_topic_predict([title])
                 m.textbox.insert(Tkinter.END, str(count) + ':  ' )
