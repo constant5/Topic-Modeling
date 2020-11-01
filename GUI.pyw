@@ -63,8 +63,8 @@ class gui_interface():
 
             if 'Credentials.txt' != os.path.basename(credentials_file) or not credentials_file:
 
-                m.CButton.place(x=25,y=531)
-                m.CButton.update
+                m.GCButton.place(x=25,y=531)
+                m.GCButton.update
             
                 msg = "Invalid or Missing Credentials.\n\nPlease update or locate "
                 msg += "the Credentials.txt file before using this this API.\n"
@@ -93,21 +93,19 @@ class gui_interface():
 
         # Test credentials
         Test = redditscraper(credentials_dictionary).Get_Reddit_Comments('Politics', 1, 'top', after='3d')
-        print(Test)
-
 
         if isinstance(Test, pd.DataFrame):
             
-            m.CButton.place_forget()
-
+            m.GCButton.place_forget()
+            m.PTSButton.place(x=550,y=561)
             m.textbox.delete(1.0, Tkinter.END)
             m.textbox.configure(fg='black')
             m.textbox.update()
 
         else:
-
-            m.CButton.place(x=25,y=531)
-            m.CButton.update
+            m.GCButton.configure(state = 'normal')
+            m.GCButton.place(x=25,y=531)
+            m.GCButton.update
             
             msg = "Invalid or Missing Credentials.\n\nPlease update or locate "
             msg += "the Credentials.txt file before using this this API.\n\n"
@@ -120,7 +118,6 @@ class gui_interface():
 
         return credentials_dictionary
 
-    
     def _GET_TOPIC(self, e=""):
 
         self.Access = 0
@@ -203,7 +200,7 @@ class gui_interface():
 
     def _Get_Credentials(self):
 
-        self.__Get_Credentials_File__("")
+        return self.__Get_Credentials_File__("")
 
     def _Plot_Dist(self):
 
@@ -263,13 +260,13 @@ class gui_interface():
 
     def _ButtonPress(self, e=""):
 
-        m.TButton.focus_set()
-        m.TButton.update()
+        m.GSTButton.focus_set()
+        m.GSTButton.update()
 
     def _ButtonRelease(self, e=""):
 
-        m.TButton.focus_set()
-        m.TButton.update()
+        m.GSTButton.focus_set()
+        m.GSTButton.update()
 
     def _Create_GUI_Window(self):
     
@@ -298,8 +295,11 @@ class gui_interface():
         canvas2.place(x=25, y=50)
         canvas2.update()
 
+        Message = "Checking for a valid Credentials File. Please Wait . . .\n"
+
         textbox = Tkinter.Text(canvas2, relief=Tkinter.FLAT)
-        textbox.insert(Tkinter.END, "Type a Sub Reddit Topic in the Entry Box Below.\n")
+        #textbox.insert(Tkinter.END, "Type a Sub Reddit Topic in the Entry Box Below.\n")
+        textbox.insert(Tkinter.END, Message)
         textbox.configure(font=("Arial",12))
 
         textbox.place(x=20, y=50)
@@ -337,33 +337,36 @@ class gui_interface():
         text = 'GET  SUBREDDIT  TOPIC'
         command = self._GET_TOPIC
 
-        TButton = Tkinter.Button(canvas, width=29, text=text, command=command)
-        __main__.TButton = TButton
-        TButton.place(x=332,y=531)
+        GSTButton = Tkinter.Button(canvas, width=29, text=text, command=command)
+        __main__.GSTButton = GSTButton
+        GSTButton.place(x=332,y=531)
         
-        TButton.bind('<ButtonPress-1>',self._ButtonPress)
-        TButton.bind('<ButtonRelease-1>',self._ButtonRelease)
+        GSTButton.bind('<ButtonPress-1>',self._ButtonPress)
+        GSTButton.bind('<ButtonRelease-1>',self._ButtonRelease)
 
         text = 'PLOT TOPIC DISTRIBUTION'
         command = self._Plot_Dist
 
-        PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
-        __main__.PButton = PButton
-        PButton.place(x=550,y=531)
+        PTDButton = Tkinter.Button(canvas, width=30, text=text, command=command)
+        __main__.PTDButton = PTDButton
+        PTDButton.place(x=550,y=531)
 
         text = 'PLOT TIME-SERIES'
         command = self._Plot_TS
 
-        PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
-        __main__.PButton = PButton
-        PButton.place(x=550,y=561)
-
+        PTSButton = Tkinter.Button(canvas, width=30, text=text, command=command)
+        __main__.PTSButton = PTSButton
+        PTSButton.place(x=550,y=561)
+        PTSButton.place_forget()
+        
         text = 'GET REDDIT CREDENTIALS'
         command = self._Get_Credentials
 
-        CButton = Tkinter.Button(canvas, width=105, text=text, command=command)
-        __main__.CButton = CButton
-        CButton.place(x=25,y=531)
+        GCButton = Tkinter.Button(canvas, width=105, text=text, command=command)
+        __main__.GCButton = GCButton
+        GCButton.place(x=25,y=531)
+
+        GCButton['state'] = 'disabled'
         
         m.window = window
         self._check_tbox_focus()
