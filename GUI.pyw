@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import praw
 import tkinter as Tkinter
 import tkinter.filedialog
 import traceback
@@ -44,15 +45,16 @@ class gui_interface():
     def __Get_Credentials_File__(self, credentials_file = 'Credentials.txt'):
 
         Valid_Keys = 0
+        Access = 0
 
         time.sleep(3)
 
         m.textbox.delete(1.0, Tkinter.END)  
-
-        while not os.path.isfile(credentials_file) or not Valid_Keys:
+        
+        while not os.path.isfile(credentials_file) or not Valid_Keys or not Access:
 
             if not os.path.isfile(credentials_file):
-
+               
                time.sleep(3)
             
                msg = "\nInvalid or Missing Credentials File in the local "
@@ -104,7 +106,7 @@ class gui_interface():
             'YOUR_REDDIT_LOGIN_PASSWORD' in CF_Data)
              
             if not Valid_Keys:
-
+               
                credentials_file = ""
                
                msg = "\nINVALID Credentials File FORMAT.\n"
@@ -115,54 +117,93 @@ class gui_interface():
                   
                continue
                
-        m.textbox.delete(1.0, Tkinter.END)
-        
-        Message = "Checking for a valid Credentials File. Please Wait . . .\n"
-
-        m.textbox.insert(Tkinter.END, Message )
-        m.textbox.configure(fg='black')
-        m.textbox.update()
+            if not Access:
                
-        CF = open(credentials_file, 'r')
-        CF_Data = CF.read()
-        CF.close()
-
-        credentials_dictionary = {}
+               m.textbox.delete(1.0, Tkinter.END)
         
-        for Line in CF_Data.splitlines():
-            if not Line.strip():
-                continue
+               Msg = "Checking for a valid Credentials File. Please Wait . . .\n"
+               
+               m.textbox.insert(Tkinter.END, Msg )
+               m.textbox.configure(fg='black')
+               m.textbox.update()
+               
+               CF = open(credentials_file, 'r')
+               CF_Data = CF.read()
+               CF.close()
 
-            Key, Value = Line.split('=')
+               credentials_dictionary = {}
+        
+               for Line in CF_Data.splitlines():
+                  if not Line.strip():
+                     continue
 
-            credentials_dictionary[Key.strip()] = Value.strip()
+                  Key, Value = Line.split('=')
 
-        # Test credentials
-        Test = redditscraper(credentials_dictionary).Get_Reddit_Comments('Politics', 1, 'top', after='3d')
+                  credentials_dictionary[Key.strip()] = Value.strip()
 
-        if isinstance(Test, pd.DataFrame):
+               cred = credentials_dictionary
+               
+               if os.path.isfile('Verified_Credentials.txt'):
+                  
+                  VCF = open(credentials_file, 'r')
+                  VCF_Data = VCF.read()
+                  VCF.close()
+
+                  if VCF_Data == CF_Data:
+                      
+                      m.GCButton.place_forget()
+                      m.PTSButton.place(x=550,y=561)
+                      m.textbox.delete(1.0, Tkinter.END)
+                      m.textbox.configure(fg='black')
+                      m.textbox.update()
+                      return credentials_dictionary
+               
+               # Test credentials
+               try:
+
+                  YOUR_APP_NAME                = cred['YOUR_APP_NAME']
+                  PERSONAL_USE_SCRIPT_14_CHARS = cred['PERSONAL_USE_SCRIPT_14_CHARS']
+                  SECRET_KEY_27_CHARS          = cred['SECRET_KEY_27_CHARS']
+                  YOUR_REDDIT_USER_NAME        = cred['YOUR_REDDIT_USER_NAME']
+                  YOUR_REDDIT_LOGIN_PASSWORD   = cred['YOUR_REDDIT_LOGIN_PASSWORD']
+
+                  Reddit = praw.Reddit(client_id=PERSONAL_USE_SCRIPT_14_CHARS,
+                                 client_secret=SECRET_KEY_27_CHARS,
+                                 user_agent=YOUR_APP_NAME, 
+                                 username=YOUR_REDDIT_USER_NAME, 
+                                 password=YOUR_REDDIT_LOGIN_PASSWORD)
+
+                  list(Reddit.subreddit('food').top(limit=1))
+
+                  Access = 1
+
+               except:
+                  #print( "".join(traceback.format_exception(*sys.exc_info())) )
+                  pass
+                
+               if Access:
             
-            m.GCButton.place_forget()
-            m.PTSButton.place(x=550,y=561)
-            m.textbox.delete(1.0, Tkinter.END)
-            m.textbox.configure(fg='black')
-            m.textbox.update()
+                  CF = open(credentials_file, 'r')
+                  CF_Data = CF.read()
+                  CF.close()
+                  
+                  VCF = open('Verified_Credentials.txt', 'w')
+                  VCF.write(CF_Data)
+                  VCF.close()
+                  
+                  m.GCButton.place_forget()
+                  m.PTSButton.place(x=550,y=561)
+                  m.textbox.delete(1.0, Tkinter.END)
+                  m.textbox.configure(fg='black')
+                  m.textbox.update()
+               
+               else:
 
-        else:
-            m.GCButton.configure(state = 'normal')
-            m.GCButton.place(x=25,y=531)
-            m.GCButton.update
-            
-            msg = "Invalid or Missing Credentials.\n\nPlease update or locate "
-            msg += "the Credentials.txt file before using this this API.\n\n"
-            msg += Test
-            
-            m.textbox.delete(1.0, Tkinter.END)
-            m.textbox.insert(1.0, msg )
-            m.textbox.configure(fg='red')
-            m.textbox.update()
+                  credentials_file = ""
 
-        return credentials_dictionary
+                  continue
+
+               return credentials_dictionary
 
     def _GET_TOPIC(self, e=""):
 
