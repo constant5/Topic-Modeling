@@ -1,6 +1,7 @@
 
 import os
 import sys
+import time
 import tkinter as Tkinter
 import tkinter.filedialog
 import traceback
@@ -42,39 +43,86 @@ class gui_interface():
     
     def __Get_Credentials_File__(self, credentials_file = 'Credentials.txt'):
 
-        # txt_file_path = credentials_file
-        
-        if not os.path.isfile(credentials_file):
+        Valid_Keys = 0
+
+        time.sleep(3)
+
+        m.textbox.delete(1.0, Tkinter.END)  
+
+        while not os.path.isfile(credentials_file) or not Valid_Keys:
+
+            if not os.path.isfile(credentials_file):
+
+               time.sleep(3)
             
-            # Where Am I File & Path
-            file_path = sys._getframe().f_code.co_filename
+               msg = "\nInvalid or Missing Credentials File in the local "
+               msg += "directory.\n\nPlease locate or update ( ...\\\\"
+               msg += "Credentials.txt ) file before using this API.\n"
 
-            # This Directory
-            Dir = os.path.dirname(file_path)
+               m.textbox.insert(Tkinter.END, msg )
+               m.textbox.configure(fg='red')
+               m.textbox.update()
 
-            #Abbreviate
-            Select_File = tkFileDialog.askopenfilename
+               time.sleep(3)
 
-            T = "Select File Path to Credentials.txt"
-            F = (("TXT files","*.txt"),("all files","*.*"))
-            TF = Select_File(initialdir = Dir, title = T, filetypes = F)
+               # Where Am I File & Path
+               file_path = sys._getframe().f_code.co_filename
+
+               # This Directory
+               Dir = os.path.dirname(file_path)
+
+               #Abbreviate
+               Select_File = tkFileDialog.askopenfilename
+
+               T = "Select File Path to Credentials.txt"
+               F = (("TXT files","*.txt"),("all files","*.*"))
+               cFile = Select_File(initialdir = Dir, title = T, filetypes = F)
         
-            credentials_file = TF
+               credentials_file = cFile
 
-            if 'Credentials.txt' != os.path.basename(credentials_file) or not credentials_file:
+               if 'Credentials.txt' != os.path.basename(cFile) or not cFile:
 
-                m.GCButton.place(x=25,y=531)
-                m.GCButton.update
-            
-                msg = "Invalid or Missing Credentials.\n\nPlease update or locate "
-                msg += "the Credentials.txt file before using this this API.\n"
-                m.textbox.delete(1.0, Tkinter.END)
-                m.textbox.insert(1.0, msg )
-                m.textbox.configure(fg='red')
-                m.textbox.update()
+                  credentials_file = ""
 
-                return
+                  msg = "\nINVALID Credentials File Name.\n"
+                  msg += cFile
+                  
+                  m.textbox.configure(fg='red')
+                  m.textbox.insert(Tkinter.END, msg )
+                  m.textbox.update()
+                  
+                  continue
                 
+            CF = open(credentials_file, 'r')
+            CF_Data = CF.read()
+            CF.close()
+              
+            Valid_Keys = min('YOUR_APP_NAME' in CF_Data,
+            'PERSONAL_USE_SCRIPT_14_CHARS' in CF_Data,           
+            'SECRET_KEY_27_CHARS' in CF_Data,
+            'YOUR_REDDIT_USER_NAME' in CF_Data,
+            'YOUR_REDDIT_LOGIN_PASSWORD' in CF_Data)
+             
+            if not Valid_Keys:
+
+               credentials_file = ""
+               
+               msg = "\nINVALID Credentials File FORMAT.\n"
+               
+               m.textbox.configure(fg='red')
+               m.textbox.insert(Tkinter.END, msg )
+               m.textbox.update()
+                  
+               continue
+               
+        m.textbox.delete(1.0, Tkinter.END)
+        
+        Message = "Checking for a valid Credentials File. Please Wait . . .\n"
+
+        m.textbox.insert(Tkinter.END, Message )
+        m.textbox.configure(fg='black')
+        m.textbox.update()
+               
         CF = open(credentials_file, 'r')
         CF_Data = CF.read()
         CF.close()
@@ -88,8 +136,6 @@ class gui_interface():
             Key, Value = Line.split('=')
 
             credentials_dictionary[Key.strip()] = Value.strip()
-
-        # self.credentials = credentials_dictionary
 
         # Test credentials
         Test = redditscraper(credentials_dictionary).Get_Reddit_Comments('Politics', 1, 'top', after='3d')
@@ -200,7 +246,7 @@ class gui_interface():
 
     def _Get_Credentials(self):
 
-        return self.__Get_Credentials_File__("")
+        return self.__Get_Credentials_File__()
 
     def _Plot_Dist(self):
 
