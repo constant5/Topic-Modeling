@@ -1,6 +1,7 @@
 
 import os
 import sys
+import math
 import tkinter as Tkinter
 import tkinter.filedialog
 import traceback
@@ -12,6 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
+import scipy.stats as ss
 
 tkFileDialog = tkinter.filedialog
 
@@ -227,23 +229,52 @@ class gui_interface():
         plt.show()
 
     def _Plot_Ani(self):
+
+        _, pred = self.get_topic_predict(list(self.Comments['body']))
+        pred = [p+1 for p in pred]
+
+            
+        def norm_pdf(x, i):
+            mu = np.mean(pred[:i])
+            sigma = np.std(pred[:i])
+            return ss.norm.pdf(x, mu, sigma)
+
+        class UpdateDist:
+            def __init__(self, ax):
+                sns.set_style('darkgrid')
+                self.line, = ax.plot([], [], 'k-')
+                self.text = ax.text(0.1,.95,'')
+                self.x = np.linspace(0, 9, 200)
+                self.ax = ax
+                self.freeze = []
+
+                # Set up plot parameters
+                self.ax.set_xlim(0, 10)
+                self.ax.set_ylim(0, 1)
+                self.ax.grid(True)
+
+                # This vertical line represents the theoretical value, to
+                # which the plotted distribution should converge.
+                for i in range(10):
+                    self.ax.axvline(i, linestyle='--', color='black')
+        
+
+            def __call__(self, i):
+                # This way the plot can continuously run and we just keep
+                # watching new realizations of the process
+                y =  norm_pdf(self.x, i)
+                self.line.set_data(self.x, y)
+                self.text.set_text(f't={i}')
+
+                if i%25==0:
+                    self.freeze.append(self.ax.plot(self.x, y))
+
+
+                return self.line, self.text, 
+
         fig, ax = plt.subplots()
-        xdata, ydata = [], []
-        ln, = plt.plot([], [], 'ro')
-
-        def init():
-            ax.set_xlim(0, 2*np.pi)
-            ax.set_ylim(-1, 1)
-            return ln,
-
-        def update(frame):
-            xdata.append(frame)
-            ydata.append(np.sin(frame))
-            ln.set_data(xdata, ydata)
-            return ln,
-
-        ani = FuncAnimation(fig, update, frames=np.linspace(0, 2*np.pi, 128),
-                            init_func=init, blit=True)
+        ud = UpdateDist(ax)
+        anim = FuncAnimation(fig, ud, frames=len(pred), interval=100, blit=True)
         plt.show()
 
 
@@ -388,7 +419,7 @@ class gui_interface():
         PButton.place(x=550,y=561)
 
 
-        text = 'ANIMATE TIME-SERIES'
+        text = 'ANIMATE TOPIC DISTRIBUTION'
         command = self._Plot_Ani
 
         PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
