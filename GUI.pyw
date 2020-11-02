@@ -45,85 +45,167 @@ class gui_interface():
     
     def __Get_Credentials_File__(self, credentials_file = 'Credentials.txt'):
 
-        # txt_file_path = credentials_file
+        Valid_Keys = 0
+        Access = 0
+
+        time.sleep(3)
+
+        m.textbox.delete(1.0, Tkinter.END)  
         
-        if not os.path.isfile(credentials_file):
+        while not os.path.isfile(credentials_file) or not Valid_Keys or not Access:
+
+            if not os.path.isfile(credentials_file):
+               
+               time.sleep(3)
             
-            # Where Am I File & Path
-            file_path = sys._getframe().f_code.co_filename
+               msg = "\nInvalid or Missing Credentials File in the local "
+               msg += "directory.\n\nPlease locate or update ( ...\\\\"
+               msg += "Credentials.txt ) file before using this API.\n"
 
-            # This Directory
-            Dir = os.path.dirname(file_path)
+               m.textbox.insert(Tkinter.END, msg )
+               m.textbox.configure(fg='red')
+               m.textbox.update()
 
-            #Abbreviate
-            Select_File = tkFileDialog.askopenfilename
+               time.sleep(3)
 
-            T = "Select File Path to Credentials.txt"
-            F = (("TXT files","*.txt"),("all files","*.*"))
-            TF = Select_File(initialdir = Dir, title = T, filetypes = F)
+               # Where Am I File & Path
+               file_path = sys._getframe().f_code.co_filename
+
+               # This Directory
+               Dir = os.path.dirname(file_path)
+
+               #Abbreviate
+               Select_File = tkFileDialog.askopenfilename
+
+               T = "Select File Path to Credentials.txt"
+               F = (("TXT files","*.txt"),("all files","*.*"))
+               cFile = Select_File(initialdir = Dir, title = T, filetypes = F)
         
-            credentials_file = TF
+               credentials_file = cFile
 
-            if 'Credentials.txt' != os.path.basename(credentials_file) or not credentials_file:
+               if 'Credentials.txt' != os.path.basename(cFile) or not cFile:
 
-                m.CButton.place(x=25,y=531)
-                m.CButton.update
-            
-                msg = "Invalid or Missing Credentials.\n\nPlease update or locate "
-                msg += "the Credentials.txt file before using this this API.\n"
-                m.textbox.delete(1.0, Tkinter.END)
-                m.textbox.insert(1.0, msg )
-                m.textbox.configure(fg='red')
-                m.textbox.update()
+                  credentials_file = ""
 
-                return
+                  msg = "\nINVALID Credentials File Name.\n"
+                  msg += cFile
+                  
+                  m.textbox.configure(fg='red')
+                  m.textbox.insert(Tkinter.END, msg )
+                  m.textbox.update()
+                  
+                  continue
                 
-        CF = open(credentials_file, 'r')
-        CF_Data = CF.read()
-        CF.close()
-
-        credentials_dictionary = {}
+            CF = open(credentials_file, 'r')
+            CF_Data = CF.read()
+            CF.close()
+              
+            Valid_Keys = min('YOUR_APP_NAME' in CF_Data,
+            'PERSONAL_USE_SCRIPT_14_CHARS' in CF_Data,           
+            'SECRET_KEY_27_CHARS' in CF_Data,
+            'YOUR_REDDIT_USER_NAME' in CF_Data,
+            'YOUR_REDDIT_LOGIN_PASSWORD' in CF_Data)
+             
+            if not Valid_Keys:
+               
+               credentials_file = ""
+               
+               msg = "\nINVALID Credentials File FORMAT.\n"
+               
+               m.textbox.configure(fg='red')
+               m.textbox.insert(Tkinter.END, msg )
+               m.textbox.update()
+                  
+               continue
+               
+            if not Access:
+               
+               m.textbox.delete(1.0, Tkinter.END)
         
-        for Line in CF_Data.splitlines():
-            if not Line.strip():
-                continue
+               Msg = "Checking for a valid Credentials File. Please Wait . . .\n"
+               
+               m.textbox.insert(Tkinter.END, Msg )
+               m.textbox.configure(fg='black')
+               m.textbox.update()
+               
+               CF = open(credentials_file, 'r')
+               CF_Data = CF.read()
+               CF.close()
 
-            Key, Value = Line.split('=')
+               credentials_dictionary = {}
+        
+               for Line in CF_Data.splitlines():
+                  if not Line.strip():
+                     continue
 
-            credentials_dictionary[Key.strip()] = Value.strip()
+                  Key, Value = Line.split('=')
 
-        # self.credentials = credentials_dictionary
+                  credentials_dictionary[Key.strip()] = Value.strip()
 
-        # Test credentials
-        Test = redditscraper(credentials_dictionary).Get_Reddit_Comments('Politics', 1, 'top', after='3d')
-        print(Test)
+               cred = credentials_dictionary
+               
+               if os.path.isfile('Verified_Credentials.txt'):
+                  
+                  VCF = open(credentials_file, 'r')
+                  VCF_Data = VCF.read()
+                  VCF.close()
 
+                  if VCF_Data == CF_Data:
+                      
+                      m.GCButton.place_forget()
+                      m.PTSButton.place(x=550,y=561)
+                      m.textbox.delete(1.0, Tkinter.END)
+                      m.textbox.configure(fg='black')
+                      m.textbox.update()
+                      return credentials_dictionary
+               
+               # Test credentials
+               try:
 
-        if isinstance(Test, pd.DataFrame):
+                  YOUR_APP_NAME                = cred['YOUR_APP_NAME']
+                  PERSONAL_USE_SCRIPT_14_CHARS = cred['PERSONAL_USE_SCRIPT_14_CHARS']
+                  SECRET_KEY_27_CHARS          = cred['SECRET_KEY_27_CHARS']
+                  YOUR_REDDIT_USER_NAME        = cred['YOUR_REDDIT_USER_NAME']
+                  YOUR_REDDIT_LOGIN_PASSWORD   = cred['YOUR_REDDIT_LOGIN_PASSWORD']
+
+                  Reddit = praw.Reddit(client_id=PERSONAL_USE_SCRIPT_14_CHARS,
+                                 client_secret=SECRET_KEY_27_CHARS,
+                                 user_agent=YOUR_APP_NAME, 
+                                 username=YOUR_REDDIT_USER_NAME, 
+                                 password=YOUR_REDDIT_LOGIN_PASSWORD)
+
+                  list(Reddit.subreddit('food').top(limit=1))
+
+                  Access = 1
+
+               except:
+                  #print( "".join(traceback.format_exception(*sys.exc_info())) )
+                  pass
+                
+               if Access:
             
-            m.CButton.place_forget()
+                  CF = open(credentials_file, 'r')
+                  CF_Data = CF.read()
+                  CF.close()
+                  
+                  VCF = open('Verified_Credentials.txt', 'w')
+                  VCF.write(CF_Data)
+                  VCF.close()
+                  
+                  m.GCButton.place_forget()
+                  m.PTSButton.place(x=550,y=561)
+                  m.textbox.delete(1.0, Tkinter.END)
+                  m.textbox.configure(fg='black')
+                  m.textbox.update()
+               
+               else:
 
-            m.textbox.delete(1.0, Tkinter.END)
-            m.textbox.configure(fg='black')
-            m.textbox.update()
+                  credentials_file = ""
 
-        else:
+                  continue
 
-            m.CButton.place(x=25,y=531)
-            m.CButton.update
-            
-            msg = "Invalid or Missing Credentials.\n\nPlease update or locate "
-            msg += "the Credentials.txt file before using this this API.\n\n"
-            msg += Test
-            
-            m.textbox.delete(1.0, Tkinter.END)
-            m.textbox.insert(1.0, msg )
-            m.textbox.configure(fg='red')
-            m.textbox.update()
+               return credentials_dictionary
 
-        return credentials_dictionary
-
-    
     def _GET_TOPIC(self, e=""):
 
         self.Access = 0
@@ -137,19 +219,25 @@ class gui_interface():
             m.LBox.insert(0, "5")
             m.LBox.configure(fg='black')
             m.LBox.update()
-            Limit = 5
+            self.Limit = 5
 
         self.Limit = int(self.Limit)
 
         if "Type Sub Reddit Topic Here" in self.Topic or not self.Topic:
-
-            if not self.Topic:
                 
-                msg = "No Sub Reddit Topic Found in the Entry Box Below"
-                m.textbox.delete(1.0, Tkinter.END)
-                m.textbox.insert(Tkinter.END, msg)
+            msg = "No Sub Reddit Topic Found in the Entry Box Below"
+            m.textbox.delete(1.0, Tkinter.END)
+            m.textbox.insert(Tkinter.END, msg)
                 
             return
+
+        m.textbox.configure(fg='black')
+        m.textbox.delete(1.0, Tkinter.END)
+
+        msg ="\n\nGetting Reddit_Comments. Please Wait . . . \n\n"
+
+        m.textbox.insert(Tkinter.END, msg)
+        m.textbox.update()
 
         #Get Subreddit Pre-Check
         # Test_Request = self.scraper.Get_Reddit_Comments(Topic, 1)
@@ -186,6 +274,7 @@ class gui_interface():
         m.textbox.delete(1.0, Tkinter.END)
         count = 1
         for title in self.Comments['body']:
+            title = title.replace('\n', ' ')
             try:
                 _, pred = self.get_topic_predict([title])
                 m.textbox.insert(Tkinter.END, str(count) + ':  ' )
@@ -206,7 +295,7 @@ class gui_interface():
 
     def _Get_Credentials(self):
 
-        self.__Get_Credentials_File__("")
+        return self.__Get_Credentials_File__()
 
     def _Plot_Dist(self):
 
@@ -315,13 +404,13 @@ class gui_interface():
 
     def _ButtonPress(self, e=""):
 
-        m.TButton.focus_set()
-        m.TButton.update()
+        m.GSTButton.focus_set()
+        m.GSTButton.update()
 
     def _ButtonRelease(self, e=""):
 
-        m.TButton.focus_set()
-        m.TButton.update()
+        m.GSTButton.focus_set()
+        m.GSTButton.update()
 
     def _Create_GUI_Window(self):
     
@@ -344,28 +433,23 @@ class gui_interface():
         canvas.configure(background = 'white')
         canvas.pack(fill=Tkinter.BOTH, expand=1)
         canvas.update()
-
-        # Create a Grdient Background
-        for row in range(0,height)[::-1]:
-            r = int(row / (height - 1)*0)
-            g = int(row / (height - 1)*0)
-            b = int(row / (height - 1)*125)
-
-            canvas.create_line(0,row,width,row, fill = "#%02x%02x%02x" % (r, g, b) )
-
+        
         canvas2 = Tkinter.Canvas(window, highlightthickness=0)
         canvas2.configure(background = 'white')
         canvas2.place(x=25, y=50)
         canvas2.update()
 
-        textbox = Tkinter.Text(canvas2, relief=Tkinter.RAISED)
-        textbox.insert(Tkinter.END, "Type a Sub Reddit Topic in the Entry Box Below.\n")
+        Message = "Checking for a valid Credentials File. Please Wait . . .\n"
+
+        textbox = Tkinter.Text(canvas2, relief=Tkinter.FLAT)
+        #textbox.insert(Tkinter.END, "Type a Sub Reddit Topic in the Entry Box Below.\n")
+        textbox.insert(Tkinter.END, Message)
         textbox.configure(font=("Arial",12))
 
         textbox.place(x=20, y=50)
         textbox['width'] = 80
         textbox['height'] = 26
-        textbox['bg'] =   'white'#'#008800'
+        textbox['bg'] =   '#eaeaf2' # 'white'
         textbox['bd'] = 2
         textbox.update()
     
@@ -397,41 +481,36 @@ class gui_interface():
         text = 'GET  SUBREDDIT  TOPIC'
         command = self._GET_TOPIC
 
-        TButton = Tkinter.Button(canvas, width=29, text=text, command=command)
-        __main__.TButton = TButton
-        TButton.place(x=332,y=531)
+        GSTButton = Tkinter.Button(canvas, width=29, text=text, command=command)
+        __main__.GSTButton = GSTButton
+        GSTButton.place(x=332,y=531)
         
-        TButton.bind('<ButtonPress-1>',self._ButtonPress)
-        TButton.bind('<ButtonRelease-1>',self._ButtonRelease)
+        GSTButton.bind('<ButtonPress-1>',self._ButtonPress)
+        GSTButton.bind('<ButtonRelease-1>',self._ButtonRelease)
 
         text = 'PLOT TOPIC DISTRIBUTION'
         command = self._Plot_Dist
 
-        PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
-        __main__.PButton = PButton
-        PButton.place(x=550,y=531)
+        PTDButton = Tkinter.Button(canvas, width=30, text=text, command=command)
+        __main__.PTDButton = PTDButton
+        PTDButton.place(x=550,y=531)
 
         text = 'PLOT TIME-SERIES'
         command = self._Plot_TS
 
-        PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
-        __main__.PButton = PButton
-        PButton.place(x=550,y=561)
-
-
-        text = 'ANIMATE TOPIC DISTRIBUTION'
-        command = self._Plot_Ani
-
-        PButton = Tkinter.Button(canvas, width=30, text=text, command=command)
-        __main__.PButton = PButton
-        PButton.place(x=332,y=561)
-
+        PTSButton = Tkinter.Button(canvas, width=30, text=text, command=command)
+        __main__.PTSButton = PTSButton
+        PTSButton.place(x=550,y=561)
+        PTSButton.place_forget()
+        
         text = 'GET REDDIT CREDENTIALS'
         command = self._Get_Credentials
 
-        CButton = Tkinter.Button(canvas, width=105, text=text, command=command)
-        __main__.CButton = CButton
-        CButton.place(x=25,y=531)
+        GCButton = Tkinter.Button(canvas, width=105, text=text, command=command)
+        __main__.GCButton = GCButton
+        GCButton.place(x=25,y=531)
+
+        GCButton['state'] = 'disabled'
         
         m.window = window
         self._check_tbox_focus()
