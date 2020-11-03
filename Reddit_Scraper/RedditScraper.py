@@ -9,7 +9,7 @@ import requests
 
 class redditscraper():
 
-    def __init__(self, credentials):
+    def __init__(self, credentials, psaw=True):
         
         # self.credentials = credentials
         Reddit = praw.Reddit(client_id=credentials['PERSONAL_USE_SCRIPT_14_CHARS'],
@@ -17,7 +17,11 @@ class redditscraper():
                         user_agent=credentials['YOUR_APP_NAME'], 
                         username=credentials['YOUR_REDDIT_USER_NAME'], 
                         password=credentials['YOUR_REDDIT_LOGIN_PASSWORD'])
-        self.ps_api = PushshiftAPI(Reddit)
+
+        if psaw: 
+            self.ps_api = PushshiftAPI(Reddit)
+        else:
+            self.ps_api = Reddit
         
     def __get_date__(self, created):
         return dt.datetime.fromtimestamp(created)
