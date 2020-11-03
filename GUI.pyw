@@ -304,18 +304,10 @@ class gui_interface():
         m.textbox.update()
         
         #Attempt 1 Get Initial Request 
-        Comments1 = self.scraper.Get_Reddit_Comments(self.Topic, 
-                                    Limit=(self.Limit), 
+        self.Comments = self.scraper.Get_Reddit_Comments(self.Topic, 
+                                    Limit=(self.Limit + 200), 
                                     how='asc',
                                     after='5y')
-
-        #Attempt 2 Get Remaining Request
-        Comments2 = self.scraper.Get_Reddit_Comments(self.Topic, 
-                                    Limit=(2*(len(Comments1) - self.Limit)) + 1, 
-                                    how='asc',
-                                    after='5y')
-
-        self.Comments = Comments1 + Comments2
 
         m.textbox.delete(1.0, Tkinter.END)
         count = 1
