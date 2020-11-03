@@ -70,8 +70,23 @@ class gui_interface():
         
         self.gui_window = self._Create_GUI_Window()
         self.credentials = self.__Get_Credentials_File__()
+        
+        msg ="\n\nGetting a Reddit Instance. Please Wait . . . \n\n"
+
+        m.textbox.delete(1.0, Tkinter.END)
+        m.textbox.insert(1.0, msg )
+        m.textbox.configure(fg='black')
+        m.textbox.update()
+
         self.scraper = redditscraper(self.credentials)
 
+        m.PTSButton['state'] = 'normal'
+        m.PTDButton['state'] = 'normal'
+        m.PAGButton['state'] = 'normal'
+        m.GSTButton['state'] = 'normal'
+
+        m.textbox.delete(1.0, Tkinter.END)
+        
         self.LDA = lda_infer(os.path.join('LDA','models','hash_vect.pk'),
                              os.path.join('LDA','models','lda_model_8.pk'))
         
@@ -509,12 +524,16 @@ class gui_interface():
         GSTButton.bind('<ButtonPress-1>',self._ButtonPress)
         GSTButton.bind('<ButtonRelease-1>',self._ButtonRelease)
 
+        GSTButton['state'] = 'disabled'
+
         text = 'PLOT TOPIC DISTRIBUTION'
         command = self._Plot_Dist
 
         PTDButton = Tkinter.Button(canvas, width=30, text=text, command=command)
         __main__.PTDButton = PTDButton
         PTDButton.place(x=550,y=531)
+
+        PTDButton['state'] = 'disabled'
 
         text = 'PLOT TIME-SERIES'
         command = self._Plot_TS
@@ -524,6 +543,8 @@ class gui_interface():
         PTSButton.place(x=550,y=561)
         PTSButton.place_forget()
 
+        PTSButton['state'] = 'disabled'
+
         text = 'PLOT ANIMATION GRAPH'
         command = self._Plot_Animation
 
@@ -531,6 +552,8 @@ class gui_interface():
         __main__.PAGButton = PAGButton
         PAGButton.place(x=332,y=561)
         PAGButton.place_forget()
+
+        PAGButton['state'] = 'disabled'
         
         text = 'GET REDDIT CREDENTIALS'
         command = self._Get_Credentials
