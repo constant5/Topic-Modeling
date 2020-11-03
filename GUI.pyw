@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
 import scipy.stats as ss
+import time
+import praw
 
 tkFileDialog = tkinter.filedialog
 
@@ -44,6 +46,8 @@ class gui_interface():
         return clean_text, pred
     
     def __Get_Credentials_File__(self, credentials_file = 'Credentials.txt'):
+
+        credentials_file = os.path.join('Credentials.txt')
 
         Valid_Keys = 0
         Access = 0
@@ -95,7 +99,7 @@ class gui_interface():
                   m.textbox.update()
                   
                   continue
-                
+            print(credentials_file)
             CF = open(credentials_file, 'r')
             CF_Data = CF.read()
             CF.close()
