@@ -67,13 +67,14 @@ class gui_interface():
     def __init__(self):
         
         self.Access = 0
+        
         self.gui_window = self._Create_GUI_Window()
         self.credentials = self.__Get_Credentials_File__()
         self.scraper = redditscraper(self.credentials)
 
         self.LDA = lda_infer(os.path.join('LDA','models','hash_vect.pk'),
                              os.path.join('LDA','models','lda_model_8.pk'))
-
+        
     def get_topic_predict(self, texts):
         clean_text, pred = self.LDA.infer(texts)
         # print(pred)
@@ -90,6 +91,8 @@ class gui_interface():
         m.textbox.delete(1.0, Tkinter.END)  
         
         while not os.path.isfile(credentials_file) or not Valid_Keys or not Access:
+
+            self.credentials_dictionary = {}
 
             if not os.path.isfile(credentials_file):
                
@@ -168,18 +171,16 @@ class gui_interface():
                CF = open(credentials_file, 'r')
                CF_Data = CF.read()
                CF.close()
-
-               credentials_dictionary = {}
-        
+               
                for Line in CF_Data.splitlines():
                   if not Line.strip():
                      continue
 
                   Key, Value = Line.split('=')
 
-                  credentials_dictionary[Key.strip()] = Value.strip()
+                  self.credentials_dictionary[Key.strip()] = Value.strip()
 
-               cred = credentials_dictionary
+               cred = self.credentials_dictionary
                
                if os.path.isfile('Verified_Credentials.txt'):
                   
@@ -195,7 +196,7 @@ class gui_interface():
                       m.textbox.delete(1.0, Tkinter.END)
                       m.textbox.configure(fg='black')
                       m.textbox.update()
-                      return credentials_dictionary
+                      return self.credentials_dictionary
                
                # Test credentials
                try:
@@ -243,7 +244,7 @@ class gui_interface():
 
                   continue
 
-               return credentials_dictionary
+               return self.credentials_dictionary
 
     def _GET_TOPIC(self, e=""):
 
@@ -278,16 +279,39 @@ class gui_interface():
         m.textbox.insert(Tkinter.END, msg)
         m.textbox.update()
 
+        Access = 0
+
         #Get Subreddit Pre-Check
-        # Test_Request = self.scraper.Get_Reddit_Comments(Topic, 1)
-        Test_Request = self.scraper.Get_Reddit_Comments(self.Topic, 1, 'top', after='3d')
-        
-        if not isinstance(Test_Request, pd.DataFrame):
+        try:
+
+            cred = self.credentials_dictionary
+
+            YOUR_APP_NAME                = cred['YOUR_APP_NAME']
+            PERSONAL_USE_SCRIPT_14_CHARS = cred['PERSONAL_USE_SCRIPT_14_CHARS']
+            SECRET_KEY_27_CHARS          = cred['SECRET_KEY_27_CHARS']
+            YOUR_REDDIT_USER_NAME        = cred['YOUR_REDDIT_USER_NAME']
+            YOUR_REDDIT_LOGIN_PASSWORD   = cred['YOUR_REDDIT_LOGIN_PASSWORD']
+
+            Reddit = praw.Reddit(client_id=PERSONAL_USE_SCRIPT_14_CHARS,
+                                 client_secret=SECRET_KEY_27_CHARS,
+                                 user_agent=YOUR_APP_NAME, 
+                                 username=YOUR_REDDIT_USER_NAME, 
+                                 password=YOUR_REDDIT_LOGIN_PASSWORD)
+
+            list(Reddit.subreddit('food').top(limit=1))
+
+            Access = 1
+
+        except:
+            #print( "".join(traceback.format_exception(*sys.exc_info())) )
+            pass
+
+        if not Access:
             
             msg = '\nWeb Access Error.\n'
             msg += 'Please check your Sub_Reddit_Topic. --> '+ self.Topic +'\n'
             msg += 'Server could not understand request due to invalid syntax.'
-            msg += repr(Test_Request)
+            #msg += repr(Test_Request)
             
             m.textbox.delete(1.0, Tkinter.END)
             m.textbox.insert(1.0, msg )
@@ -305,13 +329,13 @@ class gui_interface():
         
         #Attempt 1 Get Initial Request 
         self.Comments = self.scraper.Get_Reddit_Comments(self.Topic, 
-                                    Limit=(self.Limit + 200), 
+                                    Limit=(self.Limit), 
                                     how='asc',
                                     after='5y')
 
         m.textbox.delete(1.0, Tkinter.END)
         count = 1
-        for title in self.Comments['body'][:self.Limit]:
+        for title in self.Comments['body']:
             title = title.replace('\n', ' ')
             try:
                 _, pred = self.get_topic_predict([title])
@@ -440,7 +464,6 @@ class gui_interface():
         Message = "Checking for a valid Credentials File. Please Wait . . .\n"
 
         textbox = Tkinter.Text(canvas2, relief=Tkinter.FLAT)
-        #textbox.insert(Tkinter.END, "Type a Sub Reddit Topic in the Entry Box Below.\n")
         textbox.insert(Tkinter.END, Message)
         textbox.configure(font=("Arial",12))
 
