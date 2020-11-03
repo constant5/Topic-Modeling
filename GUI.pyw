@@ -1,6 +1,8 @@
 
 import os
 import sys
+import time
+import praw
 import math
 import tkinter as Tkinter
 import tkinter.filedialog
@@ -13,9 +15,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
-import scipy.stats as ss
-import time
-import praw
 
 tkFileDialog = tkinter.filedialog
 
@@ -26,6 +25,42 @@ m = __main__
 root = Tkinter.Tk()
 root.wm_title("REDDIT_SCRAPER")
 root.withdraw()
+
+def beta_pdf(x, a, b):
+    return (x**(a-1) * (1-x)**(b-1) * math.gamma(a + b)
+            / (math.gamma(a) * math.gamma(b)))
+
+class UpdateDist:
+    def __init__(self, ax, prob=0.5):
+        self.success = 0
+        self.prob = prob
+        self.line, = ax.plot([], [], 'k-')
+        self.x = np.linspace(0, 1, 200)
+        self.ax = ax
+
+        # Set up plot parameters
+        self.ax.set_xlim(0, 1)
+        self.ax.set_ylim(0, 10)
+        self.ax.grid(True)
+
+        # This vertical line represents the theoretical value, to
+        # which the plotted distribution should converge.
+        self.ax.axvline(prob, linestyle='--', color='black')
+
+    def __call__(self, i):
+        # This way the plot can continuously run and we just keep
+        # watching new realizations of the process
+        if i == 0:
+            self.success = 0
+            self.line.set_data([], [])
+            return self.line,
+
+        # Choose success based on exceed a threshold with a uniform pick
+        if np.random.rand(1,) < self.prob:
+            self.success += 1
+        y = beta_pdf(self.x, self.success + 1, (i - self.success) + 1)
+        self.line.set_data(self.x, y)
+        return self.line,
 
 class gui_interface():
 
@@ -46,8 +81,6 @@ class gui_interface():
         return clean_text, pred
     
     def __Get_Credentials_File__(self, credentials_file = 'Credentials.txt'):
-
-        credentials_file = os.path.join('Credentials.txt')
 
         Valid_Keys = 0
         Access = 0
@@ -99,7 +132,7 @@ class gui_interface():
                   m.textbox.update()
                   
                   continue
-            print(credentials_file)
+                
             CF = open(credentials_file, 'r')
             CF_Data = CF.read()
             CF.close()
@@ -158,6 +191,7 @@ class gui_interface():
                       
                       m.GCButton.place_forget()
                       m.PTSButton.place(x=550,y=561)
+                      m.PAGButton.place(x=332,y=561)
                       m.textbox.delete(1.0, Tkinter.END)
                       m.textbox.configure(fg='black')
                       m.textbox.update()
@@ -198,6 +232,7 @@ class gui_interface():
                   
                   m.GCButton.place_forget()
                   m.PTSButton.place(x=550,y=561)
+                  m.PAGButton.place(x=332,y=561)
                   m.textbox.delete(1.0, Tkinter.END)
                   m.textbox.configure(fg='black')
                   m.textbox.update()
@@ -268,16 +303,21 @@ class gui_interface():
         m.textbox.insert(Tkinter.END, msg)
         m.textbox.update()
          
+        #Attempt 1 Get Initial Request 
         self.Comments = self.scraper.Get_Reddit_Comments(self.Topic, 
-                                    Limit=self.Limit, 
+                                    Limit=(self.Limit), 
                                     how='asc',
                                     after='5y')
-        
-        # print(Comments)
+
+        #Attempt 1 Get Remaining Request 
+        self.Comments = self.scraper.Get_Reddit_Comments(self.Topic, 
+                                    Limit=(2*(len(self.Comments) - self.Limit)), 
+                                    how='asc',
+                                    after='5y')
 
         m.textbox.delete(1.0, Tkinter.END)
         count = 1
-        for title in self.Comments['body']:
+        for title in self.Comments['body'][:self.Limit]:
             title = title.replace('\n', ' ')
             try:
                 _, pred = self.get_topic_predict([title])
@@ -306,7 +346,7 @@ class gui_interface():
         _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
-        d = sns.displot(data=pred, bins=8).set(title=f'Distribution of r/{self.Topic} topics\nn={len(pred)}')
+        d = sns.displot(pred, bins=8).set(title=f'Distribution of r/{self.Topic} topics\nn={len(pred)}')
         mids = [rect.get_x() + rect.get_width() / 2 for rect in d.ax.patches]
         plt.xticks(ticks =mids, labels= [1,2,3,4,5,6,7,8])
         plt.tight_layout()
@@ -317,59 +357,19 @@ class gui_interface():
         _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
-        ts = sns.scatterplot(x=t, y=[p+1 for p in pred])
+        ts = sns.scatterplot(t, [p+1 for p in pred])
         plt.tight_layout()
         plt.show()
 
-    def _Plot_Ani(self):
+    def _Plot_Animation(self):
 
-        _, pred = self.get_topic_predict(list(self.Comments['body']))
-        pred = [p+1 for p in pred]
-
-            
-        def norm_pdf(x, i):
-            mu = np.mean(pred[:i])
-            sigma = np.std(pred[:i])
-            return ss.norm.pdf(x, mu, sigma)
-
-        class UpdateDist:
-            def __init__(self, ax):
-                sns.set_style('darkgrid')
-                self.line, = ax.plot([], [], 'k-')
-                self.text = ax.text(0.1,.95,'')
-                self.x = np.linspace(0, 9, 200)
-                self.ax = ax
-                self.freeze = []
-
-                # Set up plot parameters
-                self.ax.set_xlim(0, 10)
-                self.ax.set_ylim(0, 1)
-                self.ax.grid(True)
-
-                # This vertical line represents the theoretical value, to
-                # which the plotted distribution should converge.
-                for i in range(10):
-                    self.ax.axvline(i, linestyle='--', color='black')
-        
-
-            def __call__(self, i):
-                # This way the plot can continuously run and we just keep
-                # watching new realizations of the process
-                y =  norm_pdf(self.x, i)
-                self.line.set_data(self.x, y)
-                self.text.set_text(f't={i}')
-
-                if i%25==0:
-                    self.freeze.append(self.ax.plot(self.x, y))
-
-
-                return self.line, self.text, 
+        # Fixing random state for reproducibility
+        np.random.seed(19680801)
 
         fig, ax = plt.subplots()
-        ud = UpdateDist(ax)
-        anim = FuncAnimation(fig, ud, frames=len(pred), interval=100, blit=True)
+        ud = UpdateDist(ax, prob=0.7)
+        anim = FuncAnimation(fig, ud, frames=100, interval=100, blit=True)
         plt.show()
-
 
     def _check_tbox_focus(self):
 
@@ -506,6 +506,14 @@ class gui_interface():
         __main__.PTSButton = PTSButton
         PTSButton.place(x=550,y=561)
         PTSButton.place_forget()
+
+        text = 'PLOT ANIMATION GRAPH'
+        command = self._Plot_Animation
+
+        PAGButton = Tkinter.Button(canvas, width=29, text=text, command=command)
+        __main__.PAGButton = PAGButton
+        PAGButton.place(x=332,y=561)
+        PAGButton.place_forget()
         
         text = 'GET REDDIT CREDENTIALS'
         command = self._Get_Credentials
