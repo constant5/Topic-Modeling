@@ -302,16 +302,16 @@ class gui_interface():
 
         m.textbox.insert(Tkinter.END, msg)
         m.textbox.update()
-         
+        
         #Attempt 1 Get Initial Request 
         Comments1 = self.scraper.Get_Reddit_Comments(self.Topic, 
                                     Limit=(self.Limit), 
                                     how='asc',
                                     after='5y')
 
-        #Attempt 2 Get Remaining Request 
+        #Attempt 2 Get Remaining Request
         Comments2 = self.scraper.Get_Reddit_Comments(self.Topic, 
-                                    Limit=(2*(len(Comments1) - self.Limit)), 
+                                    Limit=(2*(len(Comments1) - self.Limit)) + 1, 
                                     how='asc',
                                     after='5y')
 
