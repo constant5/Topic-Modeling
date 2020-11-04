@@ -15,6 +15,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
+import matplotlib.patches as mpatches
+from matplotlib.collections import PatchCollection
 import webbrowser
 from sklearn.decomposition import PCA
 tkFileDialog = tkinter.filedialog
@@ -27,47 +29,12 @@ root = Tkinter.Tk()
 root.wm_title("REDDIT_SCRAPER")
 root.withdraw()
 
-def beta_pdf(x, a, b):
-    return (x**(a-1) * (1-x)**(b-1) * math.gamma(a + b)
-            / (math.gamma(a) * math.gamma(b)))
-
-class UpdateDist:
-    def __init__(self, ax, prob=0.5):
-        self.success = 0
-        self.prob = prob
-        self.line, = ax.plot([], [], 'k-')
-        self.x = np.linspace(0, 1, 200)
-        self.ax = ax
-
-        # Set up plot parameters
-        self.ax.set_xlim(0, 1)
-        self.ax.set_ylim(0, 10)
-        self.ax.grid(True)
-
-        # This vertical line represents the theoretical value, to
-        # which the plotted distribution should converge.
-        self.ax.axvline(prob, linestyle='--', color='black')
-
-    def __call__(self, i):
-        # This way the plot can continuously run and we just keep
-        # watching new realizations of the process
-        if i == 0:
-            self.success = 0
-            self.line.set_data([], [])
-            return self.line,
-
-        # Choose success based on exceed a threshold with a uniform pick
-        if np.random.rand(1,) < self.prob:
-            self.success += 1
-        y = beta_pdf(self.x, self.success + 1, (i - self.success) + 1)
-        self.line.set_data(self.x, y)
-        return self.line,
-
 class gui_interface():
 
-    def __init__(self):
+    def __init__(self, n_topics=8):
         
         self.Access = 0
+        self.n_topics = n_topics
         
         self.gui_window = self._Create_GUI_Window()
         self.credentials = self.__Get_Credentials_File__()
@@ -91,7 +58,7 @@ class gui_interface():
         m.textbox.delete(1.0, Tkinter.END)
         
         self.LDA = lda_infer(os.path.join('LDA','models','hash_vect.pk'),
-                             os.path.join('LDA','models','lda_model_8.pk'))
+                             os.path.join('LDA','models',f'lda_model_{self.n_topics}.pk'))
         
     def get_topic_predict(self, texts):
         clean_text, pred = self.LDA.infer(texts)
@@ -383,9 +350,9 @@ class gui_interface():
         _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
-        d = sns.displot(pred, bins=8).set(title=f'Distribution of r/{self.Topic} topics\nn={len(pred)}')
+        d = sns.displot(pred, bins=self.n_topics).set(title=f'Distribution of r/{self.Topic}\nn={len(pred)}')
         mids = [rect.get_x() + rect.get_width() / 2 for rect in d.ax.patches]
-        plt.xticks(ticks =mids, labels= [1,2,3,4,5,6,7,8])
+        plt.xticks(ticks =mids, labels= list(range(1, self.n_topics+1)))
         plt.tight_layout()
         plt.show()
 
@@ -399,7 +366,7 @@ class gui_interface():
         # ts = sns.scatterplot(t, [p+1 for p in pred])
         ts = sns.lineplot(x=t_mean, y=p_mean)
         plt.tight_layout()
-        ts.set(ylim=(0,8))
+        ts.set(ylim=(0,self.n_topics))
         plt.axhline(y=int(np.mean(pred))+1,c='red', ls='--')
         plt.legend(['moving mean', 'group mean'])
         plt.title("Topic Drift Over Time")
@@ -410,24 +377,39 @@ class gui_interface():
     def _Plot_Animation(self):
  
         class UpdateDist():
-            def __init__(self, ax, pred):
-                topics = [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],
-                          [0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],
-                          [0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1]]
+            def __init__(self, ax, pred, n_topics):
+
+                sns.set_style('darkgrid')
+
+                z_list = [0]*n_topics
+                topics = [z_list.copy() for i in range(n_topics)]
+                for i in range(n_topics):
+                    topics[i][i] = 1
+                # topics = [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],
+                #           [0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],
+                #           [0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1]]
+
+
                 topics.extend(pred)
                 X = np.array(topics)
                 
                 self.pca = PCA(n_components=2)
-                x_t_top = self.pca.fit_transform(X[:8]).T
-                self.x_t_obs = self.pca.transform(X[8:]).T
+                x_t_top = self.pca.fit_transform(X[:n_topics]).T
+                self.x_t_obs = self.pca.transform(X[n_topics:]).T
 
-                markers = ['o', 'd', '+', 'v', '^', '<', '>', 's']
-                counter = 0
-                for i, m in zip(range(8), markers):
-                    plt.plot(x_t_top[0][i], 
-                            x_t_top[1][i], m, 
-                            label="Topic {}".format(counter+1), ms =15)
-                    counter += 1
+                # markers = ['o', 'd', '+', 'v', '^', '<', '>', 's']
+                # counter = 0
+                patches = []
+                x = x_t_top[0][:]
+                y= x_t_top[1][:]
+                for i in range(n_topics):
+                    circle =  mpatches.Circle((x[i], y[i]), 0.08, ec="none")
+                    ax.annotate(str(i), 
+                                xy=(x[i], y[i]),
+                                ha="center", va='center')
+                    patches.append(circle)
+                collection = PatchCollection(patches, cmap=plt.cm.hsv, alpha=0.3)
+                ax.add_collection(collection)
 
                 self.scatter,  = ax.plot([], [],
                                         marker='o',
@@ -435,11 +417,21 @@ class gui_interface():
                                         color='black',
                                         label='Comments')
                 
-                self.text = ax.text(-0.49,-0.49,'')
+                
+                
+                pad = 0.1
+                midx = (min(x)+max(x))/2
+                midy = (min(y)+max(y))/2
+                ax.axvline(midx, color='grey', alpha=0.5)
+                ax.axhline(midy, color ='grey', alpha=0.5)
+                ax.annotate('PC2', xy=(midx+.01, max(y)+0.05))
+                ax.annotate('PC1', xy=(min(x)-.09, midy+.01))
+
+                self.text = ax.text(min(x)-pad+.01,min(y)-pad+.01,'')
                 self.ax = ax
                 # Set up plot parameters
-                self.ax.set_xlim(-0.5, 1)
-                self.ax.set_ylim(-0.5, 1)
+                self.ax.set_xlim(min(x)-pad, max(x)+pad)
+                self.ax.set_ylim(min(y)-pad,max(y)+pad)
 
             def __call__(self, i):
                 # This way the plot can continuously run and we just keep
@@ -456,14 +448,14 @@ class gui_interface():
         _, pred = self.LDA.infer(list(self.Comments['body']))
         fig, ax = plt.subplots()
         sns.set_style('darkgrid')
-        ud = UpdateDist(ax, pred)
+        ud = UpdateDist(ax, pred, self.n_topics)
         anim = FuncAnimation(fig, ud, frames=len(pred), interval=100, blit=True)
-        plt.title("PCA Plot of Topics and Comments (n_dim=2)")
+        plt.title("PCA Plot of Topics and Comments")
         plt.show()
 
 
     def _Show_Topics(self):
-        webbrowser.open_new(os.path.join('LDA','results','ldavis_prepared_8.html'))
+        webbrowser.open_new(os.path.join('LDA','results',f'ldavis_prepared_{self.n_topics}.html'))
 
     def _check_tbox_focus(self):
 
@@ -645,7 +637,7 @@ class gui_interface():
 
 if __name__ == '__main__':
 
-    app = gui_interface()
+    app = gui_interface(16)
 
     def on_closing():
         m.window.destroy()
