@@ -441,6 +441,7 @@ class gui_interface():
 
         plt.legend(numpoints=1)
         plt.xlim(-1, 1.8)
+        plt.title("PCA Plot of Topics and Comments (n_dim=2)")
         plt.show()
 
     def _Show_Topics(self):
