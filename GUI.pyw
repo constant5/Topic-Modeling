@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
 import webbrowser
-
+from sklearn.decomposition import PCA
 tkFileDialog = tkinter.filedialog
 
 #Abbreviate
@@ -403,15 +403,44 @@ class gui_interface():
         plt.axhline(y=int(np.mean(pred))+1,c='red', ls='--')
         plt.legend(['moving mean', 'group mean'])
         plt.show()
-
-    def _Plot_Animation(self):
+        # Create plot
+        # ax.scatter(x_t_top[0], x_t_top[1], alpha=0.8, c="red", edgecolors='none', s=30, label="Topics")
+        # ax.scatter(x_t_obs[0], x_t_obs[1], alpha=0.8, c="blue", edgecolors='none', s=30, label="Comments")
+        #
+        # plt.title('Topic Plotting with PCA (n_comp=2)')
+        # plt.legend(loc=2)
+        # plt.show()
 
         # Fixing random state for reproducibility
-        np.random.seed(19680801)
+        # np.random.seed(19680801)
+        #
+        # fig, ax = plt.subplots()
+        # ud = UpdateDist(ax, prob=0.7)
+        # anim = FuncAnimation(fig, ud, frames=100, interval=100, blit=True)
+        # plt.show()
 
-        fig, ax = plt.subplots()
-        ud = UpdateDist(ax, prob=0.7)
-        anim = FuncAnimation(fig, ud, frames=100, interval=100, blit=True)
+    def _Plot_Animation(self):
+        _, pred = self.LDA.infer(list(self.Comments['body']))
+        topics = [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],
+                 [0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],
+                 [0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1]]
+        topics.extend(pred)
+        X = np.array(topics)
+        pca = PCA(n_components=2)
+        X_transformed = pca.fit_transform(X)
+        x_t_top = X_transformed[:8].T
+        x_t_obs = X_transformed[8:].T
+
+        markers = ['o', 'd', '+', 'v', '^', '<', '>', 's']
+        counter = 0
+        for i, m in zip(range(8), markers):
+            plt.plot(x_t_top[0][i], x_t_top[1][i], m, label="Topic {}".format(counter+1))
+            counter += 1
+
+        plt.plot(x_t_obs[0], x_t_obs[1], 'x', color='yellow', label='Comments')
+
+        plt.legend(numpoints=1)
+        plt.xlim(-1, 1.8)
         plt.show()
 
     def _Show_Topics(self):
