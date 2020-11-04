@@ -17,8 +17,9 @@ class redditscraper():
                         user_agent=credentials['YOUR_APP_NAME'], 
                         username=credentials['YOUR_REDDIT_USER_NAME'], 
                         password=credentials['YOUR_REDDIT_LOGIN_PASSWORD'])
+        self.psaw = psaw
 
-        if psaw: 
+        if self.psaw: 
             self.ps_api = PushshiftAPI(Reddit)
         else:
             self.ps_api = Reddit
@@ -27,19 +28,24 @@ class redditscraper():
         return dt.datetime.fromtimestamp(created)
 
 
-    def get_pushshift_data(self, topic, limit, after, sort, score):
+    def get_pushshift_data(self, topic, limit, after, sort, score, how):
         if isinstance(after, int): 
             after=int(dt.datetime(after, 1, 1).timestamp())
         
-        # there is a bug in the psaw module that requires this multiplier
-        if limit>100:
-            limit = limit * 10 
 
-        return self.ps_api.search_comments(after=after,
-                             subreddit=topic,
-                             sort_type=score,
-                             sort=sort,
-                             limit=limit) 
+        if self.psaw:
+            # there is a bug in the psaw module that requires this multiplier
+            if limit>100:
+                limit = limit * 10 
+            return self.ps_api.search_comments(after=after,
+                                subreddit=topic,
+                                sort_type=score,
+                                sort=sort,
+                                limit=limit)
+        if how == 'top':
+            print('fetching with praw')
+            return self.ps_api.subreddit(topic).top(limit=limit)
+        
 
     def Get_Reddit_Comments(self, Sub_Reddit_Topic, Limit, how='top', after="5y"):
 
@@ -47,25 +53,34 @@ class redditscraper():
             if how == 'top':
                 # posts = subreddit.top(limit=Limit)
                 print(f'getting top {Limit} comments over last {after}')
-                posts = self.get_pushshift_data(Sub_Reddit_Topic, Limit, after=after, sort='desc', score='score')
+                posts = self.get_pushshift_data(Sub_Reddit_Topic, Limit, after=after, sort='desc', score='score', how=how)
                 # for p in posts: print(p.body)
 
             if how == 'asc':
                 print(f'getting oldest {Limit} comments over last {after}')
-                posts = self.get_pushshift_data(Sub_Reddit_Topic, Limit, after=after, sort='asc', score='created_utc')
+                posts = self.get_pushshift_data(Sub_Reddit_Topic, Limit, after=after, sort='asc', score='created_utc', how=how)
             
             if how == 'desc':
                 print(f'getting most recent {Limit} comments over last {after}')
-                posts = self.get_pushshift_data(Sub_Reddit_Topic, Limit, after=after, sort='desc', score='created_utc')
+                posts = self.get_pushshift_data(Sub_Reddit_Topic, Limit, after=after, sort='desc', score='created_utc', how=how)
 
             topics_dict = {"created": [], 
                            "body":[]}
 
-            for submission in posts:
-                if submission.body != '[removed]':
+            
+
+            if self.psaw:
+
+                for submission in posts:
+
+                        topics_dict["created"].append(submission.created)
+                        topics_dict["body"].append(submission.body)
+            
+            else:
+                for submission in posts:
                     topics_dict["created"].append(submission.created)
-                    topics_dict["body"].append(submission.body)
-        
+                    topics_dict["body"].append(submission.title)
+
             topics_data = pd.DataFrame(topics_dict)
         
             _timestamp = topics_data["created"].apply(self.__get_date__)
