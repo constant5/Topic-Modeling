@@ -402,6 +402,7 @@ class gui_interface():
         ts.set(ylim=(0,8))
         plt.axhline(y=int(np.mean(pred))+1,c='red', ls='--')
         plt.legend(['moving mean', 'group mean'])
+        plt.title("PCA Plot of Topics and Comments (n_dim=2)")
         plt.show()
         # Create plot
         # ax.scatter(x_t_top[0], x_t_top[1], alpha=0.8, c="red", edgecolors='none', s=30, label="Topics")
@@ -420,29 +421,87 @@ class gui_interface():
         # plt.show()
 
     def _Plot_Animation(self):
+        # sns.set_style('darkgrid')
+        # _, pred = self.LDA.infer(list(self.Comments['body']))
+        # topics = [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],
+        #          [0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],
+        #          [0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1]]
+        # topics.extend(pred)
+        # X = np.array(topics)
+        # pca = PCA(n_components=2)
+        # X_transformed = pca.fit_transform(X)
+        # x_t_top = X_transformed[:8].T
+        # x_t_obs = X_transformed[8:].T
+
+        # markers = ['o', 'd', '+', 'v', '^', '<', '>', 's']
+        # counter = 0
+        # for i, m in zip(range(8), markers):
+        #     plt.plot(x_t_top[0][i], x_t_top[1][i], m, label="Topic {}".format(counter+1))
+        #     counter += 1
+
+        # plt.plot(x_t_obs[0], x_t_obs[1], 'x', color='yellow', label='Comments')
+
+        # plt.legend(numpoints=1)
+        # plt.xlim(-1, 1.8)
+        # plt.title("PCA Plot of Topics and Comments (n_dim=2)")
+        # plt.show()
+
+
+        class UpdateDist():
+            def __init__(self, ax, pred):
+                topics = [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],
+                          [0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],
+                          [0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1]]
+                topics.extend(pred)
+                X = np.array(topics)
+                
+                self.pca = PCA(n_components=2)
+                x_t_top = self.pca.fit_transform(X[:8]).T
+                # x_t_top = self.X_transformed[:8].T
+                self.x_t_obs = self.pca.transform(X[8:]).T
+                # self.X_transformed = self.pca.fit_transform(X)
+                # x_t_top = self.X_transformed[:8].T
+                # self.x_t_obs = self.X_transformed[8:].T
+                
+                sns.set_style('darkgrid')
+                markers = ['o', 'd', '+', 'v', '^', '<', '>', 's']
+                counter = 0
+                for i, m in zip(range(8), markers):
+                    plt.plot(x_t_top[0][i], 
+                            x_t_top[1][i], m, 
+                            label="Topic {}".format(counter+1), ms =15)
+                    counter += 1
+
+                self.scatter,  = ax.plot([], [],
+                                        marker='o',
+                                        ls='',
+                                        # color='black',
+                                        label='Comments')
+                
+                self.text = ax.text(-0.49,-0.49,'')
+                self.ax = ax
+                # Set up plot parameters
+                self.ax.set_xlim(-0.5, 1)
+                self.ax.set_ylim(-0.5, 1)
+
+            def __call__(self, i):
+                # This way the plot can continuously run and we just keep
+                # watching new realizations of the process
+                self.scatter.set_data(self.x_t_obs[0][:i],         
+                                    self.x_t_obs[1][:i])
+                self.text.set_text(f't={i}')
+                
+                return self.scatter, self.text, 
+
+        # Fixing random state for reproducibility
+        np.random.seed(19680801)
         _, pred = self.LDA.infer(list(self.Comments['body']))
-        topics = [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],
-                 [0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],
-                 [0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1]]
-        topics.extend(pred)
-        X = np.array(topics)
-        pca = PCA(n_components=2)
-        X_transformed = pca.fit_transform(X)
-        x_t_top = X_transformed[:8].T
-        x_t_obs = X_transformed[8:].T
-
-        markers = ['o', 'd', '+', 'v', '^', '<', '>', 's']
-        counter = 0
-        for i, m in zip(range(8), markers):
-            plt.plot(x_t_top[0][i], x_t_top[1][i], m, label="Topic {}".format(counter+1))
-            counter += 1
-
-        plt.plot(x_t_obs[0], x_t_obs[1], 'x', color='yellow', label='Comments')
-
-        plt.legend(numpoints=1)
-        plt.xlim(-1, 1.8)
+        fig, ax = plt.subplots()
+        ud = UpdateDist(ax, pred)
+        anim = FuncAnimation(fig, ud, frames=len(pred), interval=100, blit=True)
         plt.title("PCA Plot of Topics and Comments (n_dim=2)")
         plt.show()
+
 
     def _Show_Topics(self):
         webbrowser.open_new(os.path.join('LDA','results','ldavis_prepared_8.html'))
