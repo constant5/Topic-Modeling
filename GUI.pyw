@@ -15,6 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
+import webbrowser
 
 tkFileDialog = tkinter.filedialog
 
@@ -78,12 +79,14 @@ class gui_interface():
         m.textbox.configure(fg='black')
         m.textbox.update()
 
-        self.scraper = redditscraper(self.credentials)
+        self.scraper = redditscraper(self.credentials, psaw=False)
+
 
         m.PTSButton['state'] = 'normal'
         m.PTDButton['state'] = 'normal'
         m.PAGButton['state'] = 'normal'
         m.GSTButton['state'] = 'normal'
+        m.STButton['state'] = 'normal'
 
         m.textbox.delete(1.0, Tkinter.END)
         
@@ -208,6 +211,7 @@ class gui_interface():
                       m.GCButton.place_forget()
                       m.PTSButton.place(x=550,y=561)
                       m.PAGButton.place(x=332,y=561)
+                      m.STButton.place(x=550,y=10)
                       m.textbox.delete(1.0, Tkinter.END)
                       m.textbox.configure(fg='black')
                       m.textbox.update()
@@ -345,7 +349,7 @@ class gui_interface():
         #Attempt 1 Get Initial Request 
         self.Comments = self.scraper.Get_Reddit_Comments(self.Topic, 
                                     Limit=(self.Limit), 
-                                    how='asc',
+                                    how='top',
                                     after='5y')
 
         m.textbox.delete(1.0, Tkinter.END)
@@ -403,6 +407,9 @@ class gui_interface():
         ud = UpdateDist(ax, prob=0.7)
         anim = FuncAnimation(fig, ud, frames=100, interval=100, blit=True)
         plt.show()
+
+    def _Show_Topics(self):
+        webbrowser.open_new(os.path.join('LDA','results','ldavis_prepared_8.html'))
 
     def _check_tbox_focus(self):
 
@@ -554,6 +561,16 @@ class gui_interface():
         PAGButton.place_forget()
 
         PAGButton['state'] = 'disabled'
+
+        text = 'SHOW TOPICS'
+        command = self._Show_Topics
+
+        STButton = Tkinter.Button(canvas, width=29, text=text, command=command)
+        __main__.STButton = STButton
+        STButton.place(x=550,y=10)
+        STButton.place_forget()
+
+        STButton['state'] = 'disabled'
         
         text = 'GET REDDIT CREDENTIALS'
         command = self._Get_Credentials
