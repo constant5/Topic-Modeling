@@ -587,7 +587,7 @@ class gui_interface():
 
         PTSButton['state'] = 'disabled'
 
-        text = 'PLOT ANIMATION GRAPH'
+        text = 'PLOT TOPIC GRAPH'
         command = self._Plot_Animation
 
         PAGButton = Tkinter.Button(canvas, width=29, text=text, command=command)
