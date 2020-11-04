@@ -393,7 +393,7 @@ class gui_interface():
 
         _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
-        sns.set_style('dark')
+        sns.set_style('darkgrid')
         t_mean = [_t for _t in range(0, max(t), 5)]
         p_mean = [int(np.mean(pred[i:i+5])+1) for i  in range(0, max(t), 5)]
         # ts = sns.scatterplot(t, [p+1 for p in pred])
@@ -402,51 +402,13 @@ class gui_interface():
         ts.set(ylim=(0,8))
         plt.axhline(y=int(np.mean(pred))+1,c='red', ls='--')
         plt.legend(['moving mean', 'group mean'])
-        plt.title("PCA Plot of Topics and Comments (n_dim=2)")
+        plt.title("Topic Drift Over Time")
+        plt.tight_layout()
         plt.show()
-        # Create plot
-        # ax.scatter(x_t_top[0], x_t_top[1], alpha=0.8, c="red", edgecolors='none', s=30, label="Topics")
-        # ax.scatter(x_t_obs[0], x_t_obs[1], alpha=0.8, c="blue", edgecolors='none', s=30, label="Comments")
-        #
-        # plt.title('Topic Plotting with PCA (n_comp=2)')
-        # plt.legend(loc=2)
-        # plt.show()
 
-        # Fixing random state for reproducibility
-        # np.random.seed(19680801)
-        #
-        # fig, ax = plt.subplots()
-        # ud = UpdateDist(ax, prob=0.7)
-        # anim = FuncAnimation(fig, ud, frames=100, interval=100, blit=True)
-        # plt.show()
 
     def _Plot_Animation(self):
-        # sns.set_style('darkgrid')
-        # _, pred = self.LDA.infer(list(self.Comments['body']))
-        # topics = [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],
-        #          [0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],
-        #          [0,0,0,0,0,0,1,0],[0,0,0,0,0,0,0,1]]
-        # topics.extend(pred)
-        # X = np.array(topics)
-        # pca = PCA(n_components=2)
-        # X_transformed = pca.fit_transform(X)
-        # x_t_top = X_transformed[:8].T
-        # x_t_obs = X_transformed[8:].T
-
-        # markers = ['o', 'd', '+', 'v', '^', '<', '>', 's']
-        # counter = 0
-        # for i, m in zip(range(8), markers):
-        #     plt.plot(x_t_top[0][i], x_t_top[1][i], m, label="Topic {}".format(counter+1))
-        #     counter += 1
-
-        # plt.plot(x_t_obs[0], x_t_obs[1], 'x', color='yellow', label='Comments')
-
-        # plt.legend(numpoints=1)
-        # plt.xlim(-1, 1.8)
-        # plt.title("PCA Plot of Topics and Comments (n_dim=2)")
-        # plt.show()
-
-
+ 
         class UpdateDist():
             def __init__(self, ax, pred):
                 topics = [[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],
@@ -457,13 +419,8 @@ class gui_interface():
                 
                 self.pca = PCA(n_components=2)
                 x_t_top = self.pca.fit_transform(X[:8]).T
-                # x_t_top = self.X_transformed[:8].T
                 self.x_t_obs = self.pca.transform(X[8:]).T
-                # self.X_transformed = self.pca.fit_transform(X)
-                # x_t_top = self.X_transformed[:8].T
-                # self.x_t_obs = self.X_transformed[8:].T
-                
-                sns.set_style('darkgrid')
+
                 markers = ['o', 'd', '+', 'v', '^', '<', '>', 's']
                 counter = 0
                 for i, m in zip(range(8), markers):
@@ -475,7 +432,7 @@ class gui_interface():
                 self.scatter,  = ax.plot([], [],
                                         marker='o',
                                         ls='',
-                                        # color='black',
+                                        color='black',
                                         label='Comments')
                 
                 self.text = ax.text(-0.49,-0.49,'')
@@ -488,15 +445,17 @@ class gui_interface():
                 # This way the plot can continuously run and we just keep
                 # watching new realizations of the process
                 self.scatter.set_data(self.x_t_obs[0][:i],         
-                                    self.x_t_obs[1][:i])
+                                      self.x_t_obs[1][:i])
                 self.text.set_text(f't={i}')
                 
                 return self.scatter, self.text, 
 
         # Fixing random state for reproducibility
         np.random.seed(19680801)
+
         _, pred = self.LDA.infer(list(self.Comments['body']))
         fig, ax = plt.subplots()
+        sns.set_style('darkgrid')
         ud = UpdateDist(ax, pred)
         anim = FuncAnimation(fig, ud, frames=len(pred), interval=100, blit=True)
         plt.title("PCA Plot of Topics and Comments (n_dim=2)")
@@ -515,14 +474,14 @@ class gui_interface():
             
             return
 
-        if  'canvas.!entry2>' in repr(m.window.focus_get()):
+        if  'canvas.!entry>' in repr(m.window.focus_get()):
 
             if "LIMIT" in m.LBox.get().strip():
 
                 m.LBox.delete(0, Tkinter.END)
                 m.LBox.configure(fg='black')
 
-        elif  'canvas.!entry>' in repr(m.window.focus_get()):
+        elif  'canvas.!entry2>' in repr(m.window.focus_get()):
 
             if "Type Sub Reddit Topic Here" in m.TBox.get().strip():
 
@@ -595,17 +554,8 @@ class gui_interface():
         textbox['yscroll'] = scrollbar.set
         scrollbar.pack(side=Tkinter.RIGHT, fill=Tkinter.Y) #, expand=1)
         textbox.pack(fill=Tkinter.BOTH, expand=Tkinter.Y)
-
+        
         m.textbox = textbox
-
-        TBox = Tkinter.Entry(canvas, bg='white', width=27)
-        __main__.TBox = TBox
-        TBox.place(x=79,y=532)
-        TBox.configure(font=("Arial",13), fg='light grey')
-        TBox.delete(0, Tkinter.END)
-        TBox.insert(Tkinter.END, "  Type Sub Reddit Topic Here")
-
-        m.TBox = TBox
 
         LBox = Tkinter.Entry(canvas, bg='white', width=5)
         __main__.LBox = LBox
@@ -615,6 +565,15 @@ class gui_interface():
         LBox.insert(0, "LIMIT")
         
         m.LBox = LBox
+
+        TBox = Tkinter.Entry(canvas, bg='white', width=27)
+        __main__.TBox = TBox
+        TBox.place(x=79,y=532)
+        TBox.configure(font=("Arial",13), fg='light grey')
+        TBox.delete(0, Tkinter.END)
+        TBox.insert(Tkinter.END, "  Type Sub Reddit Topic Here")
+
+        m.TBox = TBox
 
         text = 'GET  SUBREDDIT  TOPIC'
         command = self._GET_TOPIC
