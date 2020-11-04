@@ -394,8 +394,14 @@ class gui_interface():
         _, pred = self.get_topic_predict(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
-        ts = sns.scatterplot(t, [p+1 for p in pred])
+        t_mean = [_t for _t in range(0, max(t), 5)]
+        p_mean = [int(np.mean(pred[i:i+5])+1) for i  in range(0, max(t), 5)]
+        # ts = sns.scatterplot(t, [p+1 for p in pred])
+        ts = sns.lineplot(x=t_mean, y=p_mean)
         plt.tight_layout()
+        ts.set(ylim=(0,8))
+        plt.axhline(y=int(np.mean(pred))+1,c='red', ls='--')
+        plt.legend(['moving mean', 'group mean'])
         plt.show()
 
     def _Plot_Animation(self):
