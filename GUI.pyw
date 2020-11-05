@@ -20,6 +20,7 @@ from matplotlib.collections import PatchCollection
 import webbrowser
 from sklearn.decomposition import PCA
 tkFileDialog = tkinter.filedialog
+from aws_post import get_topic_api 
 
 #Abbreviate
 m = __main__
@@ -47,6 +48,8 @@ class gui_interface():
         m.textbox.update()
 
         self.scraper = redditscraper(self.credentials, psaw=False)
+
+        self.get_topics = get_topic_api()
 
 
         m.PTSButton['state'] = 'normal'
