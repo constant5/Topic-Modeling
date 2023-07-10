@@ -2,7 +2,7 @@
 <div align="center">CSCE5214 Project 3</div>
 
 <p align="center">
-  <img width="100%" height="500" src="./LDA/results/wordcloud.png">
+  <img width="100%" height="500" src="./img/results/wordcloud.png">
 </p>
 
 
