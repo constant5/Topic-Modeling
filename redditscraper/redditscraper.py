@@ -7,7 +7,7 @@ import praw
 from psaw import PushshiftAPI
 import requests
 
-class redditscraper():
+class redditScraper():
 
     def __init__(self, credentials, psaw=True):
         

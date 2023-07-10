@@ -29,15 +29,11 @@ def predict(model, payload):
     try:
         # locally, payload may come in as a list
         if type(payload)==str:
-#             payload = data_process(payload)
-#             payload = hash_vectorize(payload)
             out = str(model.transform(data_process([payload]))[0])
         # in remote / container based deployment, payload comes in as a stream of bytes
         else:
-#             payload = data_process(paylod.decode())
-#             payload = hash_vectorize(payload)
             out = str(model.transform(data_process([payload.decode()]))[0])
     except Exception as e:  
-        out = [type(payload),str(e)] #useful for debugging!
+        out = [type(payload),str(e)] 
     
     return out

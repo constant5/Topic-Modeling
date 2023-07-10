@@ -43,69 +43,18 @@ parser.add_argument('--run_exp', type=str, default=None, help='list(n_topics) to
 args = parser.parse_args()
 
 
-# ### Create post generator
-# %%
-
 
 def data_processing(bz2files, max_lines=-1):
     for bz2file in  bz2files:
         bzr = bz2reader(fname=bz2file,
                         keys=['body'], 
                         max_lines=max_lines)
-        # bzr = bz2reader(fname=bz2file,
-        #                 keys=['subreddit','id', 'author','body','created_utc'], 
-        #                 max_lines=max_lines)
 
-        # pprint(bzr.build_structure())
         for data in bzr.select_keys():
             yield data['body']
 
-data_path = os.path.join(args.data_dir, '*.bz2')
-bzfile = glob(data_path)
-d = data_processing(bzfile, args.num_posts)
-print('loading data...', end=' ')
-data = [l for l in d]
-print('done')
 
-# ### Data processing steps
-# %%
-# Remove punctuation
-print('processing data...', end=' ')
-data = [re.sub('[,\\.!?]', '', x) for x in data]
-# Convert the titles to lowercase
-data = [x.lower() for x in data]
-# Remove post with less than 10 words
-data = [x for x in data if len(x.split(' '))>10]
-print('done')
-# display some data
-print('first 4 posts:')
-pprint(data[:3])
-print('\n')
 
-# ### Word Cloud visualization
-
-# %%
-if args.word_cloud:
-    print('generating word cloud...', end=' ')
-    long_string = ','.join(data)
-    # Create a WordCloud object
-    wordcloud = WordCloud(background_color="white", max_words=5000, contour_width=3, contour_color='steelblue')
-    # Generate a word cloud
-    wordcloud.generate(long_string)
-    # Save the word cloud image
-    wordcloud.to_file(os.path.join('results','wordcloud.png'))
-    # Visualize the word cloud
-    # wordcloud.to_image()
-    print('done')
-
-# %%
-### Word freq visualization and count vectorizer
-
-# %%
-
-sns.set_style('whitegrid')
-# get_ipython().run_line_magic('matplotlib', 'inline')
-# Helper function
 def plot_10_most_common_words(count_data, count_vectorizer):
     words = count_vectorizer.get_feature_names()
     total_counts = np.zeros(len(words))
@@ -127,44 +76,8 @@ def plot_10_most_common_words(count_data, count_vectorizer):
     plt.ylabel('counts')
     plt.savefig(os.path.join('results','top10words.png'), bbox_inches='tight', facecolor='white')
     plt.show()
-# Initialise the count vectorizer with the English stop words
-# count_vectorizer = CountVectorizer(stop_words='english')
-if args.hash_vect:
-    print('loading hash vectorizer...', end=' ')
-    hash_vectorizer = pickle.load(open(args.hash_vect, 'rb'))
-    hash_data = hash_vectorizer.transform(data)
-    print('done')
-else: 
-    print('fitting hash vectorizer...', end=' ')
-    hash_vectorizer = HashingVectorizer(stop_words='english',
-                                        alternate_sign=False, 
-                                        n_features=args.n_features)
-    hash_data = hash_vectorizer.fit_transform(data)
-    print('done')
-    print('saving hash vectorizer ...', end='')
-    pickle.dump(hash_vectorizer, open(os.path.join('models','hash_vect.pk'), 'wb'))
-    print('done')
 
 
-ivec = InvertableHashingVectorizer(hash_vectorizer)
-sample_size = 10000
-X_sample = random.sample(data, k=sample_size)
-print('fitting invertable hash vectorizer...', end=' ')
-count_sample = ivec.fit_transform(X_sample)
-print('done')
-# # Fit and transform the processed titles
-# count_data = count_vectorizer.fit_transform(data)
-
-# Visualize the 10 most common words
-#plot_10_most_common_words(count_data, count_vectorizer)
-if args.plot_10:
-    print('plotting top 10 in sample')
-    plot_10_most_common_words(count_sample, ivec)
-
-# ### LDA model fit
-
-# %%
-# Helper function
 def print_topics(model, count_vectorizer, n_top_words):
     words = count_vectorizer.get_feature_names()
     for topic_idx, topic in enumerate(model.components_):
@@ -189,25 +102,6 @@ def lda_experiment(number_topics, hash_data, max_iter):
     print('done')
     return lda
 
-number_topics = args.topics
-
-if not args.run_exp:
-    if args.lda_path:
-        lda = pickle.load(open(args.lda_path, 'rb'))
-    else:
-        lda = lda_experiment(args.topics, hash_data, args.max_iter)
-
-
-    # Print the topics found by the LDA model
-    print("Topics found via LDA:")
-    number_words = 10
-    print(f'Displaying top {number_words} words in LDA topics')
-    print_topics(lda, ivec, number_words)
-
-
-
-
-# %%
 
 def prepare_vis(lda, count_sample, ivec,number_topics):
     print('preparing LDAvis...', end=' ')
@@ -217,10 +111,7 @@ def prepare_vis(lda, count_sample, ivec,number_topics):
     pyLDAvis.save_html(LDAvis_prepared, LDAvis_data_filepath +'.html')
     print('done')
 
-if args.prepare_vis:
-    prepare_vis(lda, count_sample, ivec,args.topics)
 
-# %%
 def run_experiment(n_topics, max_iter):
     n_topics = [int(n) for n in n_topics.replace('[','').replace(']','').split(',')]
     print(n_topics)
@@ -229,7 +120,91 @@ def run_experiment(n_topics, max_iter):
         lda = lda_experiment(n, hash_data, max_iter)
         prepare_vis(lda, count_sample, ivec,n)
 
-if args.run_exp:
-    run_experiment(args.run_exp, args.max_iter)
+
+
+if __name__ == '__main__':
+    sns.set_style('whitegrid')
+
+    data_path = os.path.join(args.data_dir, '*.bz2')
+    bzfile = glob(data_path)
+    d = data_processing(bzfile, args.num_posts)
+    print('loading data...', end=' ')
+    data = [l for l in d]
+    print('done')
+
+    print('processing data...', end=' ')
+    data = [re.sub('[,\\.!?]', '', x) for x in data]
+    # Convert the titles to lowercase
+    data = [x.lower() for x in data]
+    # Remove post with less than 10 words
+    data = [x for x in data if len(x.split(' '))>10]
+    print('done')
+    # display some data
+    print('first 4 posts:')
+    pprint(data[:3])
+    print('\n')
+
+    if args.hash_vect:
+        print('loading hash vectorizer...', end=' ')
+        hash_vectorizer = pickle.load(open(args.hash_vect, 'rb'))
+        hash_data = hash_vectorizer.transform(data)
+        print('done')
+    else: 
+        print('fitting hash vectorizer...', end=' ')
+        hash_vectorizer = HashingVectorizer(stop_words='english',
+                                            alternate_sign=False, 
+                                            n_features=args.n_features)
+        hash_data = hash_vectorizer.fit_transform(data)
+        print('done')
+        print('saving hash vectorizer ...', end='')
+        pickle.dump(hash_vectorizer, open(os.path.join('models','hash_vect.pk'), 'wb'))
+        print('done')
+
+
+    ivec = InvertableHashingVectorizer(hash_vectorizer)
+    sample_size = 10000
+    X_sample = random.sample(data, k=sample_size)
+    print('fitting invertable hash vectorizer...', end=' ')
+    count_sample = ivec.fit_transform(X_sample)
+    print('done')
+
+    if args.run_exp:
+        run_experiment(args.run_exp, args.max_iter)
+    
+    number_topics = args.topics
+
+    if not args.run_exp:
+        if args.lda_path:
+            lda = pickle.load(open(args.lda_path, 'rb'))
+        else:
+            lda = lda_experiment(args.topics, hash_data, args.max_iter)
+
+        # Print the topics found by the LDA model
+        print("Topics found via LDA:")
+        number_words = 10
+        print(f'Displaying top {number_words} words in LDA topics')
+        print_topics(lda, ivec, number_words)
+
+    if args.prepare_vis:
+        prepare_vis(lda, count_sample, ivec,args.topics)
+
+    if args.plot_10:
+        print('plotting top 10 in sample')
+        plot_10_most_common_words(count_sample, ivec)
+
+    if args.word_cloud:
+        print('generating word cloud...', end=' ')
+        long_string = ','.join(data)
+        # Create a WordCloud object
+        wordcloud = WordCloud(background_color="white", max_words=5000, contour_width=3, contour_color='steelblue')
+        # Generate a word cloud
+        wordcloud.generate(long_string)
+        # Save the word cloud image
+        wordcloud.to_file(os.path.join('results','wordcloud.png'))
+        # Visualize the word cloud
+        # wordcloud.to_image()
+        print('done')
+
+
 
 
