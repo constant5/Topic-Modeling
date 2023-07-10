@@ -18,7 +18,7 @@ The stored reddit dataset contains several years of reddit post stored in compre
 
 
 <p align="center">
-  <img width="600" height="400" src="./LDA/results/top10words.png">
+  <img width="600" height="400" src="./img/results/top10words.png">
 </p>
 
 * Trained and evaluated several different LDA models on AWS EC2 to find the best model architecture for Reddit-style text.
