@@ -2,25 +2,25 @@
 import os
 import sys
 import time
-import praw
-import math
 import tkinter as Tkinter
 import tkinter.filedialog
-import traceback
+import webbrowser
+
 import __main__
-import pandas as pd
-from Reddit_Scraper.RedditScraper import redditscraper
-from LDA.LDA_Infer import lda_infer
-import numpy as np
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import numpy as np
+import praw
 import seaborn as sns
 from matplotlib.animation import FuncAnimation
-import matplotlib.patches as mpatches
 from matplotlib.collections import PatchCollection
-import webbrowser
 from sklearn.decomposition import PCA
+
+from lda.lda_infer import ldaInfer
+from redditscraper.redditscraper import redditScraper
+
 tkFileDialog = tkinter.filedialog
-from aws_post import get_topic_api 
+from aws_poster.aws_post import getTopicAPI
 
 #Abbreviate
 m = __main__
@@ -30,7 +30,7 @@ root = Tkinter.Tk()
 root.wm_title("REDDIT_SCRAPER")
 root.withdraw()
 
-class gui_interface():
+class guiInterface():
 
     def __init__(self, n_topics=8):
         
@@ -38,7 +38,7 @@ class gui_interface():
         self.n_topics = n_topics
         
         self.gui_window = self._Create_GUI_Window()
-        self.credentials = self.__Get_Credentials_File__()
+        self.credentials = self.__get_credentials_file__()
         
         msg ="\n\nGetting a Reddit Instance. Please Wait . . . \n\n"
 
@@ -47,9 +47,9 @@ class gui_interface():
         m.textbox.configure(fg='black')
         m.textbox.update()
 
-        self.scraper = redditscraper(self.credentials, psaw=False)
+        self.scraper = redditScraper(self.credentials, psaw=False)
 
-        self.get_topics = get_topic_api()
+        self.get_topics = getTopicAPI()
 
 
         m.PTSButton['state'] = 'normal'
@@ -60,16 +60,16 @@ class gui_interface():
 
         m.textbox.delete(1.0, Tkinter.END)
         
-        self.LDA = lda_infer(os.path.join('LDA','models','hash_vect.pk'),
+        self.LDA = ldaInfer(os.path.join('LDA','models','hash_vect.pk'),
                              os.path.join('LDA','models',f'lda_model_{self.n_topics}.pk'))
         
-    def get_topic_predict(self, texts):
+    def __get_topic_predict__(self, texts):
         clean_text, pred = self.LDA.infer(texts)
         # print(pred)
         pred =  [np.where(r==r.max())[0][0] for r in pred]
         return clean_text, pred
     
-    def __Get_Credentials_File__(self, credentials_file = 'Credentials.txt'):
+    def __get_credentials_file__(self, credentials_file = 'Credentials.txt'):
 
         Valid_Keys = 0
         Access = 0
@@ -235,7 +235,7 @@ class gui_interface():
 
                return self.credentials_dictionary
 
-    def _GET_TOPIC(self, e=""):
+    def _get_topic__(self, e=""):
 
         self.Access = 0
 
@@ -327,7 +327,7 @@ class gui_interface():
         for title in self.Comments['body']:
             title = title.replace('\n', ' ')
             try:
-                _, pred = self.get_topic_predict([title])
+                _, pred = self.__get_topic_predict__([title])
                 m.textbox.insert(Tkinter.END, str(count) + ':  ' )
                 m.textbox.insert(Tkinter.END, title[:75] + ' . . . . . ')
                 m.textbox.insert(Tkinter.END, str(pred) + ' . ')
@@ -343,14 +343,13 @@ class gui_interface():
                 count += 1
                 pass
             
+    def __get_credentials__(self):
 
-    def _Get_Credentials(self):
+        return self.__get_credentials_file__()
 
-        return self.__Get_Credentials_File__()
+    def __plot_dist__(self):
 
-    def _Plot_Dist(self):
-
-        _, pred = self.get_topic_predict(list(self.Comments['body']))
+        _, pred = self.__get_topic_predict__(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('dark')
         d = sns.displot(pred, bins=self.n_topics).set(title=f'Distribution of r/{self.Topic}\nn={len(pred)}')
@@ -359,9 +358,9 @@ class gui_interface():
         plt.tight_layout()
         plt.show()
 
-    def _Plot_TS(self):
+    def __plot_tse__(self):
 
-        _, pred = self.get_topic_predict(list(self.Comments['body']))
+        _, pred = self.__get_topic_predict__(list(self.Comments['body']))
         t = range(len(pred))
         sns.set_style('darkgrid')
         t_mean = [_t for _t in range(0, max(t), 5)]
@@ -376,8 +375,7 @@ class gui_interface():
         plt.tight_layout()
         plt.show()
 
-
-    def _Plot_Animation(self):
+    def __plot__animation__(self):
  
         class UpdateDist():
             def __init__(self, ax, pred, n_topics):
@@ -456,8 +454,7 @@ class gui_interface():
         plt.title("PCA Plot of Topics and Comments")
         plt.show()
 
-
-    def _Show_Topics(self):
+    def __show_topics__(self):
         webbrowser.open_new(os.path.join('LDA','results',f'ldavis_prepared_{self.n_topics}.html'))
 
     def _check_tbox_focus(self):
@@ -571,7 +568,7 @@ class gui_interface():
         m.TBox = TBox
 
         text = 'GET  SUBREDDIT  TOPIC'
-        command = self._GET_TOPIC
+        command = self._get_topic__
 
         GSTButton = Tkinter.Button(canvas, width=29, text=text, command=command)
         __main__.GSTButton = GSTButton
@@ -583,7 +580,7 @@ class gui_interface():
         GSTButton['state'] = 'disabled'
 
         text = 'PLOT TOPIC DISTRIBUTION'
-        command = self._Plot_Dist
+        command = self.__plot_dist__
 
         PTDButton = Tkinter.Button(canvas, width=30, text=text, command=command)
         __main__.PTDButton = PTDButton
@@ -592,7 +589,7 @@ class gui_interface():
         PTDButton['state'] = 'disabled'
 
         text = 'PLOT TIME-SERIES'
-        command = self._Plot_TS
+        command = self.__plot_tse__
 
         PTSButton = Tkinter.Button(canvas, width=30, text=text, command=command)
         __main__.PTSButton = PTSButton
@@ -602,7 +599,7 @@ class gui_interface():
         PTSButton['state'] = 'disabled'
 
         text = 'TOPIC PREDICTION PCA'
-        command = self._Plot_Animation
+        command = self.__plot__animation__
 
         PAGButton = Tkinter.Button(canvas, width=29, text=text, command=command)
         __main__.PAGButton = PAGButton
@@ -612,7 +609,7 @@ class gui_interface():
         PAGButton['state'] = 'disabled'
 
         text = 'SHOW TOPICS'
-        command = self._Show_Topics
+        command = self.__show_topics__
 
         STButton = Tkinter.Button(canvas, width=29, text=text, command=command)
         __main__.STButton = STButton
@@ -622,7 +619,7 @@ class gui_interface():
         STButton['state'] = 'disabled'
         
         text = 'GET REDDIT CREDENTIALS'
-        command = self._Get_Credentials
+        command = self.__get_credentials__
 
         GCButton = Tkinter.Button(canvas, width=105, text=text, command=command)
         __main__.GCButton = GCButton
@@ -640,7 +637,7 @@ class gui_interface():
 
 if __name__ == '__main__':
 
-    app = gui_interface(16)
+    app = guiInterface(8)
 
     def on_closing():
         m.window.destroy()

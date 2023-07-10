@@ -1,7 +1,7 @@
 import pickle
 import re
 
-class lda_infer():
+class ldaInfer():
 
     def __init__(self, hash_vect, lda_path):
         self.hv = pickle.load(open(hash_vect, 'rb'))
