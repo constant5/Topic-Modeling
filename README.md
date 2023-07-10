@@ -45,6 +45,8 @@ See [chdoig pytexas 2015](https://github.com/chdoig/pytexas2015-topic-modeling) 
 
 [Project Slides](https://docs.google.com/presentation/d/1ERowUiQGl1vcdxdkJvggwoQTMK2b4Gydfo8AUgfXwBA/edit#slide=id.p)
 
+[Project Video](https://drive.google.com/file/d/13QyBANggfO6JJV47Mxljzu0heR2KoLcw/view?usp=sharing)
+
 [Project Proposal](https://docs.google.com/document/d/1IurVytwQQfzHEKRggLSTXKWmXXx2LFkrBNVKZ_a2GtI/edit#heading=h.c5fey97qfjje)
 
 [Update Video](https://drive.google.com/file/d/1hvJlHa4zyfh-9UsIehlHxT7YNYm7797_/view?usp=sharing)
